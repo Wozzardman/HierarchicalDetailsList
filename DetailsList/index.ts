@@ -529,6 +529,7 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
      */
     private buildHierarchyGroupsAndItems(): { items: any[], groups: any[] } {
         if (!this.hierarchyManager) {
+            console.warn('⚠️ buildHierarchyGroupsAndItems: No hierarchy manager');
             return { items: [], groups: [] };
         }
 
@@ -536,6 +537,12 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
         const items: any[] = [];
         const groups: any[] = [];
         let currentIndex = 0;
+
+        console.log('🏗️ Building groups and items:', {
+            totalNodes: state.totalNodes,
+            rootIds: state.rootIds.length,
+            expandedIds: state.expandedIds.size
+        });
 
         // Process each root node and its children
         for (const rootId of state.rootIds) {
@@ -1161,12 +1168,19 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
         const hierarchyState = this.hierarchyEnabled && this.hierarchyManager ? this.hierarchyManager.getState() : null;
         const hasHierarchyData = hierarchyState !== null && hierarchyState.totalNodes > 0;
         
+        console.log('🔍 Hierarchy check:', {
+            hierarchyEnabled: this.hierarchyEnabled,
+            hasManager: !!this.hierarchyManager,
+            hierarchyState: hierarchyState,
+            hasHierarchyData: hasHierarchyData
+        });
+        
         if (hasHierarchyData && this.hierarchyManager) {
             // Build flat items array and FluentUI groups structure
             const result = this.buildHierarchyGroupsAndItems();
             items = result.items;
             groups = result.groups;
-            console.log(`🌳 Using FluentUI groups: ${groups.length} groups, ${items.length} total items`);
+            console.log(`🌳 Using FluentUI groups: ${groups.length} groups, ${items.length} total items`, groups);
         } else {
             // Standard flat list
             items = this.sortedRecordsIds.map(recordId => {
