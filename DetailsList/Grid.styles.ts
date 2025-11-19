@@ -3,8 +3,8 @@ export function concatClassNames(classNames: (string | undefined)[]): string | u
     return classes !== '' ? classes : undefined;
 }
 
-export const ClassNames = {
-    JvtFilteredDetailsListV2: 'JvtFilteredDetailsListV2',
+export const classNames = {
+    JvtFilteredDetailsListV2: 'JvtHierarchicalDetailsListV1',
     subTextRowBreak: 'sub-text-row-wrapper-break',
     inlineLabel: 'inine-label',
     statusTag: 'status-tag',

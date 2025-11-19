@@ -1,13 +1,13 @@
-import { FilteredDetailsListV2 } from '../index';
+import { HierarchicalDetailsListV1 } from '../index';
 import { IInputs } from '../generated/ManifestTypes';
 
-describe('Cancel Changes Functionality', () => {
-    let component: FilteredDetailsListV2;
+describe('CancelChanges functionality', () => {
+    let component: HierarchicalDetailsListV1;
     let mockContext: any;
     let mockNotifyOutputChanged: jest.Mock;
 
     beforeEach(() => {
-        component = new FilteredDetailsListV2();
+        component = new HierarchicalDetailsListV1;
         mockNotifyOutputChanged = jest.fn();
 
         mockContext = {

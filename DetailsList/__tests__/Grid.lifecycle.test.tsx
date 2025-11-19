@@ -3,7 +3,7 @@ import { IInputs } from '../generated/ManifestTypes';
 import { MockContext, MockState } from '../__mocks__/mock-context';
 import { MockColumn, MockDataSet, MockEntityRecord } from '../__mocks__/mock-datasets';
 import { getMockParameters } from '../__mocks__/mock-parameters';
-import { FilteredDetailsListV2 } from '..';
+import { HierarchicalDetailsListV1 } from '..';
 import { ColumnsColumns, RecordsColumns } from '../ManifestConstants';
 
 // Since requestAnimationFrame does not exist in the test DOM, mock it
@@ -12,7 +12,7 @@ window.requestAnimationFrame = jest.fn().mockImplementation((callback) => {
 });
 jest.useFakeTimers();
 
-describe('FilteredDetailsListV2', () => {
+describe('HierarchicalDetailsListV1', () => {
     beforeEach(() => jest.clearAllMocks());
     it('renders', () => {
         const { component, context, notifyOutputChanged } = createComponent();

@@ -11,6 +11,8 @@ import { performanceMonitor } from './performance/PerformanceMonitor';
 import { AutoUpdateManager, RecordIdentity } from './services/AutoUpdateManager';
 import { PowerAppsFxColumnEditorParser } from './services/PowerAppsFxColumnEditorParser';
 import { SelectionManager, SelectionState } from './services/SelectionManager';
+import { HierarchyManager } from './services/HierarchyManager';
+import { HierarchyConfig } from './types/Hierarchy.types';
 
 // Initialize global data source registry for conditional lookups
 if (typeof window !== 'undefined') {
@@ -36,7 +38,7 @@ const SelectionTypes: Record<'0' | '1' | '2', SelectionMode> = {
     '2': SelectionMode.multiple,
 };
 
-export class FilteredDetailsListV2 implements ComponentFramework.ReactControl<IInputs, IOutputs> {
+export class HierarchicalDetailsListV1 implements ComponentFramework.ReactControl<IInputs, IOutputs> {
     private static readonly COLUMN_LIMIT: number = 125;
     notifyOutputChanged: () => void;
     container: HTMLDivElement;
@@ -147,6 +149,15 @@ export class FilteredDetailsListV2 implements ComponentFramework.ReactControl<II
     private maxRecoveryAttempts = 5;
     private forceRecoveryTimer: number | null = null;
     private maxForceRecoveryTime = 10000; // 10 seconds max before forcing recovery
+    
+    // Hierarchy management
+    private hierarchyManager: import('./services/HierarchyManager').HierarchyManager | null = null;
+    private hierarchyEnabled = false;
+    private hierarchyExpandedKeys: string[] = [];
+    private hierarchyCollapsedKeys: string[] = [];
+    private hierarchyExpandEvent: string = '';
+    private hierarchyExpandedRowKey: string = '';
+    private hierarchyChildRecordCount: number = 0;
 
     // Loading state tracking
     private isLoading = false;
@@ -361,7 +372,154 @@ export class FilteredDetailsListV2 implements ComponentFramework.ReactControl<II
             endComponentInit();
         }
 
+        // Initialize hierarchy manager
+        this.initializeHierarchy();
+
         console.log('🚀 Enterprise features initialized');
+    }
+
+    /**
+     * Initialize hierarchy management for parent-child relationships
+     */
+    private initializeHierarchy(): void {
+        try {
+            // Check if childRecords dataset is available
+            const hasChildDataset = this.context?.parameters?.childRecords !== undefined;
+            
+            if (hasChildDataset) {
+                console.log('🌳 Initializing hierarchy manager...');
+                
+                const hierarchyConfig: Partial<HierarchyConfig> = {
+                    enabled: true,
+                    autoDetectKeys: true,
+                    defaultExpandLevel: 0, // Start collapsed
+                    indentSize: 24,
+                    showExpandCollapseAll: true,
+                    enableCaching: true,
+                    maxDepth: 10,
+                    lazyLoadChildren: false,
+                };
+
+                this.hierarchyManager = new HierarchyManager(hierarchyConfig);
+                this.hierarchyEnabled = true;
+                
+                console.log('✅ Hierarchy manager initialized');
+            } else {
+                console.log('ℹ️ No childRecords dataset - hierarchy disabled');
+                this.hierarchyEnabled = false;
+            }
+        } catch (error) {
+            console.error('❌ Error initializing hierarchy:', error);
+            this.hierarchyEnabled = false;
+        }
+    }
+
+    /**
+     * Update hierarchy data with parent and child records
+     */
+    private updateHierarchyData(
+        context: ComponentFramework.Context<IInputs>,
+        parentDataset: ComponentFramework.PropertyTypes.DataSet,
+        columns: ComponentFramework.PropertyTypes.DataSet
+    ): void {
+        if (!this.hierarchyManager) return;
+
+        try {
+            // Get child records dataset
+            const childDataset = context.parameters.childRecords;
+            
+            if (!childDataset || childDataset.loading) {
+                console.log('ℹ️ Child records not ready yet');
+                return;
+            }
+
+            // Convert datasets to arrays of records
+            const parentRecords = parentDataset.sortedRecordIds?.map(id => parentDataset.records[id]) || [];
+            const childRecords = childDataset.sortedRecordIds?.map(id => childDataset.records[id]) || [];
+
+            console.log(`🌳 Updating hierarchy: ${parentRecords.length} parents, ${childRecords.length} children`);
+
+            // Initialize hierarchy manager with the datasets
+            const detectionResult = this.hierarchyManager.initialize(parentRecords, childRecords);
+
+            if (detectionResult.canEstablishHierarchy) {
+                console.log(`✅ Hierarchy established: ${detectionResult.matchCount} relationships found`);
+                console.log(`   Relationship:`, detectionResult.relationship);
+                
+                // Store expanded state
+                this.hierarchyExpandedKeys = this.hierarchyManager.getExpandedIds();
+                
+                // Update child count for output
+                const state = this.hierarchyManager.getState();
+                this.hierarchyChildRecordCount = state.visibleCount;
+            } else {
+                console.warn('⚠️ Could not establish hierarchy:', detectionResult.warnings);
+                if (detectionResult.suggestedConfig) {
+                    console.log('💡 Suggested configuration:', detectionResult.suggestedConfig);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error updating hierarchy data:', error);
+        }
+    }
+
+    /**
+     * Toggle hierarchy expansion for a specific row
+     */
+    private toggleHierarchyExpansion(nodeId: string): void {
+        if (!this.hierarchyManager) return;
+
+        try {
+            this.hierarchyManager.toggleExpand(nodeId);
+            
+            // Update state
+            this.hierarchyExpandedKeys = this.hierarchyManager.getExpandedIds();
+            this.hierarchyExpandEvent = 'expand';
+            this.hierarchyExpandedRowKey = nodeId;
+            
+            // Trigger output update
+            this.notifyOutputChanged();
+            
+            console.log(`🌳 Toggled hierarchy for node: ${nodeId}`);
+        } catch (error) {
+            console.error('❌ Error toggling hierarchy:', error);
+        }
+    }
+
+    /**
+     * Expand all hierarchy nodes
+     */
+    private expandAllHierarchy(): void {
+        if (!this.hierarchyManager) return;
+
+        try {
+            this.hierarchyManager.expandAll();
+            this.hierarchyExpandedKeys = this.hierarchyManager.getExpandedIds();
+            this.hierarchyExpandEvent = 'expandAll';
+            this.notifyOutputChanged();
+            
+            console.log('🌳 Expanded all hierarchy nodes');
+        } catch (error) {
+            console.error('❌ Error expanding all:', error);
+        }
+    }
+
+    /**
+     * Collapse all hierarchy nodes
+     */
+    private collapseAllHierarchy(): void {
+        if (!this.hierarchyManager) return;
+
+        try {
+            this.hierarchyManager.collapseAll();
+            this.hierarchyExpandedKeys = this.hierarchyManager.getExpandedIds();
+            this.hierarchyExpandEvent = 'collapseAll';
+            this.notifyOutputChanged();
+            
+            console.log('🌳 Collapsed all hierarchy nodes');
+        } catch (error) {
+            console.error('❌ Error collapsing all:', error);
+        }
     }
 
     /**
@@ -537,8 +695,8 @@ export class FilteredDetailsListV2 implements ComponentFramework.ReactControl<II
 
         // Set column limit to 150 for the selected columns dataset
         try {
-            if (columns?.paging && columns.paging.pageSize !== FilteredDetailsListV2.COLUMN_LIMIT) {
-                columns.paging.setPageSize(FilteredDetailsListV2.COLUMN_LIMIT);
+            if (columns?.paging && columns.paging.pageSize !== HierarchicalDetailsListV1.COLUMN_LIMIT) {
+                columns.paging.setPageSize(HierarchicalDetailsListV1.COLUMN_LIMIT);
                 columns.refresh();
             }
         } catch (columnError) {
@@ -799,6 +957,11 @@ export class FilteredDetailsListV2 implements ComponentFramework.ReactControl<II
 
             this.datasetColumns = processedColumns;
 
+            // Update hierarchy if enabled
+            if (this.hierarchyEnabled && this.hierarchyManager) {
+                this.updateHierarchyData(context, dataset, columns);
+            }
+
             // Initialize filters from input if provided
             const filtersInput = context.parameters.AppliedFilters?.raw;
             if (filtersInput && typeof filtersInput === 'string') {
@@ -835,35 +998,81 @@ export class FilteredDetailsListV2 implements ComponentFramework.ReactControl<II
 
         // Convert records to items for UltimateEnterpriseGrid
         // Keep the PCF EntityRecord structure intact for proper data type handling
-        const items = this.sortedRecordsIds.map(recordId => {
-            const record = this.records[recordId];
-            if (!record) return null;
+        // If hierarchy is enabled, use hierarchical node data instead
+        let items: any[];
+        
+        if (this.hierarchyEnabled && this.hierarchyManager) {
+            // Get visible nodes from hierarchy manager
+            const visibleNodes = this.hierarchyManager.getVisibleNodes();
+            console.log(`🌳 Using hierarchical data: ${visibleNodes.length} visible nodes`);
             
-            // Return the PCF EntityRecord directly with additional properties for grid compatibility
-            const enhancedRecord = {
-                ...record,
-                recordId: recordId,
-                key: recordId,
-                // Add a getter method for the grid to access values by column name
-                getValueByColumn: (columnName: string) => {
-                    try {
-                        return record.getValue(columnName);
-                    } catch (e) {
-                        return null;
+            items = visibleNodes.map(node => {
+                const record = node.data;
+                if (!record) return null;
+                
+                // Return the PCF EntityRecord with hierarchy metadata
+                const enhancedRecord = {
+                    ...record,
+                    recordId: node.id,
+                    key: node.id,
+                    // Hierarchy properties
+                    hierarchyNode: node,
+                    hierarchyLevel: node.level,
+                    hasChildren: node.hasChildren,
+                    isExpanded: node.isExpanded,
+                    childCount: node.childCount,
+                    // Add a getter method for the grid to access values by column name
+                    getValueByColumn: (columnName: string) => {
+                        try {
+                            return record.getValue(columnName);
+                        } catch (e) {
+                            return null;
+                        }
+                    },
+                    // Add a getter for formatted values (for display)
+                    getFormattedValueByColumn: (columnName: string) => {
+                        try {
+                            return record.getFormattedValue(columnName);
+                        } catch (e) {
+                            return null;
+                        }
                     }
-                },
-                // Add a getter for formatted values (for display)
-                getFormattedValueByColumn: (columnName: string) => {
-                    try {
-                        return record.getFormattedValue(columnName);
-                    } catch (e) {
-                        return null;
+                };
+                
+                return enhancedRecord;
+            }).filter(item => item !== null);
+        } else {
+            // Standard flat list
+            items = this.sortedRecordsIds.map(recordId => {
+                const record = this.records[recordId];
+                if (!record) return null;
+                
+                // Return the PCF EntityRecord directly with additional properties for grid compatibility
+                const enhancedRecord = {
+                    ...record,
+                    recordId: recordId,
+                    key: recordId,
+                    // Add a getter method for the grid to access values by column name
+                    getValueByColumn: (columnName: string) => {
+                        try {
+                            return record.getValue(columnName);
+                        } catch (e) {
+                            return null;
+                        }
+                    },
+                    // Add a getter for formatted values (for display)
+                    getFormattedValueByColumn: (columnName: string) => {
+                        try {
+                            return record.getFormattedValue(columnName);
+                        } catch (e) {
+                            return null;
+                        }
                     }
-                }
-            };
-            
-            return enhancedRecord;
-        }).filter(item => item !== null);
+                };
+                
+                return enhancedRecord;
+            }).filter(item => item !== null);
+        }
 
         // Add new rows from pending changes
         for (const [recordId, changes] of this.pendingChanges.entries()) {
@@ -1229,6 +1438,13 @@ export class FilteredDetailsListV2 implements ComponentFramework.ReactControl<II
             enableExcelClipboard: (context.parameters as any).EnableExcelClipboard?.raw || false,
             onClipboardOperation: this.handleClipboardOperation,
             
+            // Hierarchy configuration
+            enableHierarchy: this.hierarchyEnabled,
+            hierarchyIndentSize: 24,
+            onToggleHierarchyExpand: this.toggleHierarchyExpansion.bind(this),
+            onExpandAllHierarchy: this.expandAllHierarchy.bind(this),
+            onCollapseAllHierarchy: this.collapseAllHierarchy.bind(this),
+            
             onCellEdit: onCellEditWrapper,
             onCommitChanges: this.handleSaveButtonClick,
             onCancelChanges: this.handleCancelOperation,
@@ -1523,6 +1739,13 @@ export class FilteredDetailsListV2 implements ComponentFramework.ReactControl<II
         if (this.selectionManager) {
             this.selectionManager.flushPendingUpdates();
             console.log('🔄 SelectionManager pending updates flushed on destroy');
+        }
+
+        // Clean up hierarchy manager
+        if (this.hierarchyManager) {
+            this.hierarchyManager.dispose();
+            this.hierarchyManager = null;
+            console.log('🌳 Hierarchy manager disposed');
         }
     }
 

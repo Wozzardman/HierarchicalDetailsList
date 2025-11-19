@@ -1,0 +1,265 @@
+/**
+ * Hierarchy.css
+ * Styles for hierarchical data display with expand/collapse
+ */
+
+/* Hierarchical row container */
+.hierarchical-row {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    position: relative;
+}
+
+/* Indentation area */
+.hierarchy-indent {
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* Vertical lines showing hierarchy depth */
+.hierarchy-line {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+/* Chevron container */
+.hierarchy-chevron {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    flex-shrink: 0;
+}
+
+.hierarchy-chevron button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    border-radius: 2px;
+}
+
+.hierarchy-chevron button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.hierarchy-chevron button:active {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.hierarchy-chevron button:focus {
+    outline: 1px solid #0078d4;
+    outline-offset: 1px;
+}
+
+/* Content area */
+.hierarchy-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Row with children has bold text for the first column */
+.hierarchical-row[data-has-children="true"] .hierarchy-content {
+    font-weight: 600;
+}
+
+/* Expanded row styling */
+.hierarchical-row[data-is-expanded="true"] {
+    /* Optional: Add background highlight */
+}
+
+/* Different levels can have different backgrounds */
+.hierarchical-row[data-level="0"] {
+    background-color: transparent;
+}
+
+.hierarchical-row[data-level="1"] {
+    background-color: rgba(0, 0, 0, 0.01);
+}
+
+.hierarchical-row[data-level="2"] {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.hierarchical-row[data-level="3"] {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Hierarchy controls bar */
+.hierarchy-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-bottom: 1px solid #edebe9;
+    background-color: #faf9f8;
+}
+
+.hierarchy-controls-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border: 1px solid #8a8886;
+    background-color: white;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.1s ease-in-out;
+}
+
+.hierarchy-controls-button:hover {
+    background-color: #f3f2f1;
+    border-color: #323130;
+}
+
+.hierarchy-controls-button:active {
+    background-color: #edebe9;
+}
+
+.hierarchy-controls-button i {
+    font-size: 12px;
+}
+
+/* Loading state for chevron */
+.hierarchy-chevron .ms-Spinner {
+    display: inline-flex;
+}
+
+/* Animation for expanding/collapsing */
+.hierarchy-row-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.hierarchy-row-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 200ms, transform 200ms;
+}
+
+.hierarchy-row-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hierarchy-row-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 200ms, transform 200ms;
+}
+
+/* Chevron rotation animation */
+.hierarchy-chevron button {
+    transition: transform 0.2s ease-in-out;
+}
+
+.hierarchy-chevron button[aria-expanded="true"] {
+    transform: rotate(90deg);
+}
+
+.hierarchy-chevron button[aria-expanded="false"] {
+    transform: rotate(0deg);
+}
+
+/* Accessibility: Focus visible */
+.hierarchical-row:focus-within {
+    outline: 2px solid #0078d4;
+    outline-offset: -2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .hierarchy-line {
+        background: repeating-linear-gradient(
+            to right,
+            transparent,
+            transparent 19px,
+            currentColor 19px,
+            currentColor 20px
+        ) !important;
+    }
+
+    .hierarchy-chevron button {
+        border: 1px solid currentColor;
+    }
+
+    .hierarchy-chevron button:focus {
+        outline: 2px solid currentColor;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .hierarchy-controls {
+        background-color: #292827;
+        border-bottom-color: #3b3a39;
+    }
+
+    .hierarchy-controls-button {
+        background-color: #3b3a39;
+        border-color: #605e5c;
+        color: white;
+    }
+
+    .hierarchy-controls-button:hover {
+        background-color: #484644;
+        border-color: #8a8886;
+    }
+
+    .hierarchy-chevron button:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .hierarchy-chevron button:active {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* Performance optimization: GPU acceleration */
+.hierarchical-row {
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* Smooth scrolling for hierarchy navigation */
+.hierarchy-scroll-container {
+    scroll-behavior: smooth;
+}
+
+/* Child count badge */
+.hierarchy-child-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 16px;
+    padding: 0 4px;
+    margin-left: 4px;
+    background-color: #0078d4;
+    color: white;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* Empty state for no children */
+.hierarchy-empty-state {
+    padding: 24px;
+    text-align: center;
+    color: #605e5c;
+    font-style: italic;
+}
+
+.hierarchy-empty-state-icon {
+    font-size: 48px;
+    color: #c8c6c4;
+    margin-bottom: 8px;
+}

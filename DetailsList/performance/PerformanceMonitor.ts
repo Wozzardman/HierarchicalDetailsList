@@ -223,7 +223,7 @@ export class PerformanceMonitor {
         const averages = this.getAverageMetrics();
         const report = {
             timestamp: new Date().toISOString(),
-            componentName: 'FilteredDetailsListV2',
+            componentName: 'HierarchicalDetailsListV1',
             averageMetrics: averages,
             totalSamples: this.metrics.length,
             webVitalsGrade: this.calculateWebVitalsGrade(averages),
