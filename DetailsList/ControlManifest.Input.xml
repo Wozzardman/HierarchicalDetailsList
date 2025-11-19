@@ -37,32 +37,32 @@
       <property-set name="JumptoColumn" display-name-key="JumptoColumn" of-type="TwoOptions" usage="bound" required="false" />
     </data-set>
     <data-set name="childColumns" display-name-key="ChildColumns">
-      <property-set name="ColDisplayName" display-name-key="ColDisplayName" of-type="SingleLine.Text" usage="bound" required="true" />
-      <property-set name="ColName" display-name-key="ColName" of-type="SingleLine.Text" usage="bound" required="true" />
-      <property-set name="ColWidth" display-name-key="ColWidth" of-type="Whole.None" usage="bound" required="true" />
-      <property-set name="ColCellType" display-name-key="ColCellType" of-type="SingleLine.Text" usage="bound" required="false" />
-      <property-set name="ColHorizontalAlign" display-name-key="ColHorizontalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
-      <property-set name="ColVerticalAlign" display-name-key="ColVerticalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
-      <property-set name="ColHeaderHorizontalAlign" display-name-key="ColHeaderHorizontalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
-      <property-set name="ColHeaderVerticalAlign" display-name-key="ColHeaderVerticalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
-      <property-set name="ColMultiLine" display-name-key="ColIsMultiLine" of-type="TwoOptions" usage="bound" required="true" />
-      <property-set name="ColVisible" display-name-key="ColVisible" of-type="TwoOptions" usage="bound" required="false" />
-      <property-set name="ColResizable" display-name-key="ColResizable" of-type="TwoOptions" usage="bound" required="false" />
-      <property-set name="ColSortable" display-name-key="ColSortable" of-type="TwoOptions" usage="bound" required="false" />
-      <property-set name="ColSortBy" display-name-key="ColSortBy" of-type="SingleLine.Text" usage="bound" required="false" />
-      <property-set name="ColIsBold" display-name-key="ColIsBold" of-type="TwoOptions" usage="bound" required="false" />
-      <property-set name="ColHeaderPaddingLeft" display-name-key="ColHeaderPaddingLeft" of-type="Whole.None" usage="bound" required="false" />
-      <property-set name="ColPaddingLeft" display-name-key="ColPaddingLeft" of-type="Whole.None" usage="bound" required="false" />
-      <property-set name="ColPaddingTop" display-name-key="ColPaddingTop" of-type="Whole.None" usage="bound" required="false" />
-      <property-set name="ColHideWhenBlank" display-name-key="ColHideWhenBlank" of-type="TwoOptions" usage="bound" required="false" />
-      <property-set name="ColAriaTextColumn" display-name-key="ColAriaTextColumn" of-type="SingleLine.Text" usage="bound" required="false" />
-      <property-set name="ColCellActionDisabledColumn" display-name-key="ColCellActionDisabledColumn" of-type="SingleLine.Text" usage="bound" required="false" />
-      <property-set name="ColImageWidth" display-name-key="ColImageWidth" of-type="Whole.None" usage="bound" required="false" />
-      <property-set name="ColImagePadding" display-name-key="ColImagePadding" of-type="Whole.None" usage="bound" required="false" />
-      <property-set name="ColRowHeader" display-name-key="ColRowHeader" of-type="TwoOptions" usage="bound" required="false" />
-      <property-set name="ColFilterable" display-name-key="ColFilterable" of-type="TwoOptions" usage="bound" required="false" />
-      <property-set name="ColFilterType" display-name-key="ColFilterType" of-type="SingleLine.Text" usage="bound" required="false" />
-      <property-set name="JumptoColumn" display-name-key="JumptoColumn" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ChildColDisplayName" display-name-key="ColDisplayName" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="ChildColName" display-name-key="ColName" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="ChildColWidth" display-name-key="ColWidth" of-type="Whole.None" usage="bound" required="true" />
+      <property-set name="ChildColCellType" display-name-key="ColCellType" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ChildColHorizontalAlign" display-name-key="ColHorizontalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ChildColVerticalAlign" display-name-key="ColVerticalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ChildColHeaderHorizontalAlign" display-name-key="ColHeaderHorizontalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ChildColHeaderVerticalAlign" display-name-key="ColHeaderVerticalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ChildColMultiLine" display-name-key="ColIsMultiLine" of-type="TwoOptions" usage="bound" required="true" />
+      <property-set name="ChildColVisible" display-name-key="ColVisible" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ChildColResizable" display-name-key="ColResizable" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ChildColSortable" display-name-key="ColSortable" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ChildColSortBy" display-name-key="ColSortBy" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ChildColIsBold" display-name-key="ColIsBold" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ChildColHeaderPaddingLeft" display-name-key="ColHeaderPaddingLeft" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ChildColPaddingLeft" display-name-key="ColPaddingLeft" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ChildColPaddingTop" display-name-key="ColPaddingTop" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ChildColHideWhenBlank" display-name-key="ColHideWhenBlank" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ChildColAriaTextColumn" display-name-key="ColAriaTextColumn" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ChildColCellActionDisabledColumn" display-name-key="ColCellActionDisabledColumn" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ChildColImageWidth" display-name-key="ColImageWidth" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ChildColImagePadding" display-name-key="ColImagePadding" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ChildColRowHeader" display-name-key="ColRowHeader" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ChildColFilterable" display-name-key="ColFilterable" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ChildColFilterType" display-name-key="ColFilterType" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ChildJumptoColumn" display-name-key="JumptoColumn" of-type="TwoOptions" usage="bound" required="false" />
     </data-set>
     <!-- Input properties -->
     <!-- SelectionType: 0=None (no selection), 1=Single (traditional row selection), 2=Multiple (checkbox selection mode) -->
