@@ -1,10 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="JVT" constructor="FilteredDetailsListV2" version="17.5.0" display-name-key="FilteredDetailsListV2" description-key="FilteredDetailsListV2_Desc" control-type="virtual">
+  <control namespace="JVT" constructor="HierarchicalDetailsListV1" version="1.0.0" display-name-key="HierarchicalDetailsListV1" description-key="HierarchicalDetailsListV1_Desc" control-type="virtual">
     <external-service-usage enabled="false">
       <!-- Explicitly declare no external services to avoid CORS issues -->
     </external-service-usage>
     <data-set name="records" display-name-key="Records" >
+    </data-set>
+    <data-set name="childRecords" display-name-key="ChildRecords" >
     </data-set>
     <data-set name="columns" display-name-key="Columns">
       <property-set name="ColDisplayName" display-name-key="ColDisplayName" of-type="SingleLine.Text" usage="bound" required="true" />
@@ -209,6 +211,21 @@
     <property name="FilterEventColumn" display-name-key="FilterEventColumn" of-type="SingleLine.Text" usage="output" />
     <property name="FilterEventValues" display-name-key="FilterEventValues" of-type="SingleLine.Text" usage="output" />
     <property name="AllFilters" display-name-key="AllFilters" of-type="SingleLine.Text" usage="output" />
+    
+    <!-- Hierarchy Properties -->
+    <property name="EnableHierarchy" display-name-key="EnableHierarchy" of-type="TwoOptions" usage="input" required="false" default-value="false" />
+    <property name="ParentKeyColumn" display-name-key="ParentKeyColumn" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="ChildKeyColumn" display-name-key="ChildKeyColumn" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="ParentReferenceColumn" display-name-key="ParentReferenceColumn" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="AutoDetectKeys" display-name-key="AutoDetectKeys" of-type="TwoOptions" usage="input" required="false" default-value="true" />
+    <property name="DefaultExpandLevel" display-name-key="DefaultExpandLevel" of-type="Whole.None" usage="input" required="false" default-value="0" />
+    <property name="IndentSize" display-name-key="IndentSize" of-type="Whole.None" usage="input" required="false" default-value="20" />
+    <property name="ShowExpandCollapseAll" display-name-key="ShowExpandCollapseAll" of-type="TwoOptions" usage="input" required="false" default-value="true" />
+    <property name="ExpandedRowKeys" display-name-key="ExpandedRowKeys" of-type="SingleLine.Text" usage="output" />
+    <property name="CollapsedRowKeys" display-name-key="CollapsedRowKeys" of-type="SingleLine.Text" usage="output" />
+    <property name="HierarchyExpandEvent" display-name-key="HierarchyExpandEvent" of-type="SingleLine.Text" usage="output" />
+    <property name="ExpandedRowKey" display-name-key="ExpandedRowKey" of-type="SingleLine.Text" usage="output" />
+    <property name="ChildRecordCount" display-name-key="ChildRecordCount" of-type="Whole.None" usage="output" />
     
     <!-- Jump To Navigation Properties -->
     <property name="EnableJumpTo" display-name-key="EnableJumpTo" of-type="TwoOptions" usage="input" required="false" default-value="false" />
