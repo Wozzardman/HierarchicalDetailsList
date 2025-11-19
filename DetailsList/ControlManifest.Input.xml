@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest>
+  <control namespace="JVT" constructor="FilteredDetailsListV2" version="17.5.0" display-name-key="FilteredDetailsListV2" description-key="FilteredDetailsListV2_Desc" control-type="virtual">
+    <external-service-usage enabled="false">
+      <!-- Explicitly declare no external services to avoid CORS issues -->
+    </external-service-usage>
+    <data-set name="records" display-name-key="Records" >
+    </data-set>
+    <data-set name="columns" display-name-key="Columns">
+      <property-set name="ColDisplayName" display-name-key="ColDisplayName" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="ColName" display-name-key="ColName" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="ColWidth" display-name-key="ColWidth" of-type="Whole.None" usage="bound" required="true" />
+      <property-set name="ColCellType" display-name-key="ColCellType" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ColHorizontalAlign" display-name-key="ColHorizontalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ColVerticalAlign" display-name-key="ColVerticalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ColHeaderHorizontalAlign" display-name-key="ColHeaderHorizontalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ColHeaderVerticalAlign" display-name-key="ColHeaderVerticalAlign" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ColMultiLine" display-name-key="ColIsMultiLine" of-type="TwoOptions" usage="bound" required="true" />
+      <property-set name="ColVisible" display-name-key="ColVisible" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ColResizable" display-name-key="ColResizable" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ColSortable" display-name-key="ColSortable" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ColSortBy" display-name-key="ColSortBy" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ColIsBold" display-name-key="ColIsBold" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ColHeaderPaddingLeft" display-name-key="ColHeaderPaddingLeft" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ColPaddingLeft" display-name-key="ColPaddingLeft" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ColPaddingTop" display-name-key="ColPaddingTop" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ColHideWhenBlank" display-name-key="ColHideWhenBlank" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ColAriaTextColumn" display-name-key="ColAriaTextColumn" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ColCellActionDisabledColumn" display-name-key="ColCellActionDisabledColumn" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ColImageWidth" display-name-key="ColImageWidth" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ColImagePadding" display-name-key="ColImagePadding" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="ColRowHeader" display-name-key="ColRowHeader" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ColFilterable" display-name-key="ColFilterable" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ColFilterType" display-name-key="ColFilterType" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="JumptoColumn" display-name-key="JumptoColumn" of-type="TwoOptions" usage="bound" required="false" />
+    </data-set>
+    <!-- Input properties -->
+    <!-- SelectionType: 0=None (no selection), 1=Single (traditional row selection), 2=Multiple (checkbox selection mode) -->
+    <property name="SelectionType" display-name-key="SelectionType" of-type="Enum" usage="input" required="true" default-value="1">
+      <value name="None" display-name-key="None">0</value>
+      <value name="Single" display-name-key="Single">1</value>
+      <value name="Multiple" display-name-key="Multiple">2</value>
+    </property>
+    <property name="SelectRowsOnFocus" display-name-key="SelectRowsOnFocus" of-type="TwoOptions" usage="input" required="false" default-value="false" />
+    <property name="PageSize" display-name-key="PageSize" of-type="Whole.None" usage="input" default-value="150" />
+    <property name="LargeDatasetPaging" display-name-key="LargeDatasetPaging" of-type="TwoOptions" usage="input" default-value="false" />
+    <property name="PageNumber" display-name-key="PageNumber" of-type="Whole.None" usage="output" required="false" />
+    <property name="HasNextPage" display-name-key="HasNextPage" of-type="TwoOptions" usage="output" required="false" />
+    <property name="HasPreviousPage" display-name-key="HasPreviousPage" of-type="TwoOptions" usage="output" required="false" />
+    <property name="TotalRecords" display-name-key="TotalRecords" of-type="Whole.None" usage="output" required="false" />
+    <property name="TotalPages" display-name-key="TotalPages" of-type="Whole.None" usage="output" required="false" />
+    <property name="CurrentSortColumn" display-name-key="CurrentSortColumn" of-type="SingleLine.Text" usage="input" />
+    <property name="CurrentSortDirection" display-name-key="CurrentSortDirection" of-type="Enum" usage="input">
+      <value name="Ascending" display-name-key="Ascending">0</value>
+      <value name="Descending" display-name-key="Descending">1</value>
+    </property>
+    <property name="AccessibilityLabel" display-name-key="AccessibilityLabel" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="RaiseOnRowSelectionChangeEvent" display-name-key="RaiseOnRowSelectionChangeEvent" of-type="TwoOptions" usage="input" required="false" default-value="false" />
+    <property name="InputEvent" display-name-key="InputEvent" of-type="SingleLine.Text" usage="input" />
+    <property name="DataSourceName" display-name-key="DataSourceName" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="EventName" display-name-key="EventName" of-type="SingleLine.Text" usage="output" />
+    <property name="EventColumn" display-name-key="EventColumn" of-type="SingleLine.Text" usage="output" />
+    <property name="EventRowKey" display-name-key="EventRowKey" of-type="SingleLine.Text" usage="output" />
+    <property name="SortEventColumn" display-name-key="SortEventColumn" of-type="SingleLine.Text" usage="output" />
+    <property name="SortEventDirection" display-name-key="SortEventDirection" of-type="Enum" usage="output">
+      <value name="Ascending" display-name-key="Ascending">0</value>
+      <value name="Descending" display-name-key="Descending">1</value>
+    </property>
+    
+    <!-- Button Event Properties -->
+    <property name="ButtonEventName" display-name-key="ButtonEventName" of-type="SingleLine.Text" usage="output" />
+    <property name="ButtonEventType" display-name-key="ButtonEventType" of-type="SingleLine.Text" usage="output" />
+    <property name="ClickedButtonName" display-name-key="ClickedButtonName" of-type="SingleLine.Text" usage="output" />
+    <property name="ClickedButtonText" display-name-key="ClickedButtonText" of-type="SingleLine.Text" usage="output" />
+    <property name="ButtonEventSequence" display-name-key="ButtonEventSequence" of-type="Whole.None" usage="output" />
+    
+    <!-- Change Management Properties -->
+    <property name="PendingChanges" display-name-key="PendingChanges" of-type="SingleLine.Text" usage="output" />
+    <property name="HasPendingChanges" display-name-key="HasPendingChanges" of-type="TwoOptions" usage="output" />
+    <property name="ChangeCount" display-name-key="ChangeCount" of-type="Whole.None" usage="output" />
+    <property name="CommitTrigger" display-name-key="CommitTrigger" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="CancelChangesTrigger" display-name-key="CancelChangesTrigger" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="SaveTriggerReset" display-name-key="SaveTriggerReset" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="ChangeEventType" display-name-key="ChangeEventType" of-type="SingleLine.Text" usage="output" />
+    <property name="ChangedRecordKey" display-name-key="ChangedRecordKey" of-type="SingleLine.Text" usage="output" />
+    <property name="ChangedColumn" display-name-key="ChangedColumn" of-type="SingleLine.Text" usage="output" />
+    <property name="OldValue" display-name-key="OldValue" of-type="SingleLine.Text" usage="output" />
+    <property name="NewValue" display-name-key="NewValue" of-type="SingleLine.Text" usage="output" />
+    
+    <!-- Add New Row Properties -->
+    <property name="EnableAddNewRow" display-name-key="EnableAddNewRow" of-type="TwoOptions" usage="input" required="false" default-value="false" />
+    <property name="AddNewRowTrigger" display-name-key="AddNewRowTrigger" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="NewRowTemplate" display-name-key="NewRowTemplate" of-type="SingleLine.TextArea" usage="input" required="false" />
+    <property name="NewRowCreated" display-name-key="NewRowCreated" of-type="SingleLine.TextArea" usage="output" />
+    <property name="NewRowEventType" display-name-key="NewRowEventType" of-type="SingleLine.Text" usage="output" />
+    <property name="NewRowKey" display-name-key="NewRowKey" of-type="SingleLine.Text" usage="output" />
+    
+    <!-- Power Apps Integration Properties for Patch/ForAll -->
+    <property name="EditedRecords" display-name-key="EditedRecords" of-type="SingleLine.TextArea" usage="output" />
+    <property name="EditedRecordsCount" display-name-key="EditedRecordsCount" of-type="Whole.None" usage="output" />
+    <property name="PatchFormula" display-name-key="PatchFormula" of-type="SingleLine.TextArea" usage="output" />
+    <property name="ForAllFormula" display-name-key="ForAllFormula" of-type="SingleLine.TextArea" usage="output" />
+    <property name="EditedRecordKeys" display-name-key="EditedRecordKeys" of-type="SingleLine.Text" usage="output" />
+    
+    <!-- Direct Power Apps Patch Integration -->
+    <property name="PatchDataSource" display-name-key="PatchDataSource" of-type="SingleLine.Text" usage="output" />
+    <property name="PatchRecord" display-name-key="PatchRecord" of-type="SingleLine.TextArea" usage="output" />
+    <property name="PatchChanges" display-name-key="PatchChanges" of-type="SingleLine.TextArea" usage="output" />
+    <property name="PatchChangesColumn" display-name-key="PatchChangesColumn" of-type="SingleLine.Text" usage="output" />
+    <property name="PatchChangesValue" display-name-key="PatchChangesValue" of-type="SingleLine.Text" usage="output" />
+    <property name="SaveTrigger" display-name-key="SaveTrigger" of-type="SingleLine.Text" usage="output" />
+    
+    <!-- Performance Properties - Simplified for Canvas Apps -->
+    <property name="PerformanceMode" display-name-key="PerformanceMode" of-type="Enum" usage="input" required="false" default-value="1">
+      <value name="Standard" display-name-key="Standard">0</value>
+      <value name="Enterprise" display-name-key="Enterprise">1</value>
+      <value name="MetaScale" display-name-key="MetaScale">2</value>
+    </property>
+    <property name="EnableVirtualization" display-name-key="EnableVirtualization" of-type="TwoOptions" usage="input" required="false" default-value="true" />
+    <property name="VirtualizationThreshold" display-name-key="VirtualizationThreshold" of-type="Whole.None" usage="input" required="false" default-value="1000" />
+    
+    <!-- Style properties -->
+    <property name="Theme" display-name-key="Theme" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="Compact" display-name-key="Compact" of-type="TwoOptions" usage="input" required="false" default-value="true" />
+    <property name="HeaderVisible" display-name-key="HeaderVisible" of-type="TwoOptions" usage="input" required="false" default-value="true" />
+    <property name="DefaultColumnWidth" display-name-key="DefaultColumnWidth" of-type="Whole.None" usage="input" required="false" default-value="150" />
+    <property name="EnableColumnResizing" display-name-key="EnableColumnResizing" of-type="TwoOptions" usage="input" required="false" default-value="true" />
+    
+    <!-- Text sizing properties -->
+    <property name="HeaderTextSize" display-name-key="HeaderTextSize" of-type="Whole.None" usage="input" required="false" default-value="14" />
+    <property name="ColumnTextSize" display-name-key="ColumnTextSize" of-type="Whole.None" usage="input" required="false" default-value="13" />
+    
+    <!-- Header text wrapping -->
+    <property name="EnableHeaderTextWrapping" display-name-key="EnableHeaderTextWrapping" of-type="TwoOptions" usage="input" required="false" default-value="true" />
+    
+    <!-- Row styling properties -->
+    <property name="AlternateRowColor" display-name-key="AlternateRowColor" of-type="SingleLine.Text" usage="input" required="false" />
+    
+    <!-- Filter properties -->
+    <property name="EnableFiltering" display-name-key="EnableFiltering" of-type="TwoOptions" usage="input" required="false" default-value="false" />
+    <property name="FilterConfiguration" display-name-key="FilterConfiguration" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="AppliedFilters" display-name-key="AppliedFilters" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="FilterRecordsWidth" display-name-key="FilterRecordsWidth" of-type="Whole.None" usage="input" required="false" default-value="200" />
+    
+    <data-set name="editorConfig" display-name-key="EditorConfig">
+      <property-set name="ColumnKey" display-name-key="ColumnKey" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="EditorType" display-name-key="EditorType" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="IsRequired" display-name-key="IsRequired" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="IsReadOnly" display-name-key="IsReadOnly" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="Placeholder" display-name-key="Placeholder" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="MinValue" display-name-key="MinValue" of-type="Decimal" usage="bound" required="false" />
+      <property-set name="MaxValue" display-name-key="MaxValue" of-type="Decimal" usage="bound" required="false" />
+      <property-set name="MaxLength" display-name-key="MaxLength" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="IsMultiline" display-name-key="IsMultiline" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ValidationPattern" display-name-key="ValidationPattern" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="PatternErrorMessage" display-name-key="PatternErrorMessage" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="DropdownOptions" display-name-key="DropdownOptions" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="AllowDirectTextInput" display-name-key="AllowDirectTextInput" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="CurrencySymbol" display-name-key="CurrencySymbol" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="DecimalPlaces" display-name-key="DecimalPlaces" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="StepValue" display-name-key="StepValue" of-type="Decimal" usage="bound" required="false" />
+      <property-set name="ShowTime" display-name-key="ShowTime" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="DateFormat" display-name-key="DateFormat" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="MaxRating" display-name-key="MaxRating" of-type="Whole.None" usage="bound" required="false" />
+      <property-set name="AllowZeroRating" display-name-key="AllowZeroRating" of-type="TwoOptions" usage="bound" required="false" />
+      <property-set name="ShowSliderValue" display-name-key="ShowSliderValue" of-type="TwoOptions" usage="bound" required="false" />
+      <!-- Conditional Logic Fields -->
+      <property-set name="DependsOn" display-name-key="DependsOn" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="LookupMappingSource" display-name-key="LookupMappingSource" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="LookupMappingFilter" display-name-key="LookupMappingFilter" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="LookupMappingReturn" display-name-key="LookupMappingReturn" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="LookupDataSource" display-name-key="LookupDataSource" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="LookupFilterColumn" display-name-key="LookupFilterColumn" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="LookupReturnColumn" display-name-key="LookupReturnColumn" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="DefaultValueFormula" display-name-key="DefaultValueFormula" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ConditionalFormula" display-name-key="ConditionalFormula" of-type="SingleLine.Text" usage="bound" required="false" />
+      <!-- Auto-fill confirmation control per column -->
+      <property-set name="RequiresAutoFillConfirmation" display-name-key="RequiresAutoFillConfirmation" of-type="TwoOptions" usage="bound" required="false" />
+    </data-set>
+    
+    <!-- New Row Template Configuration Dataset -->
+    <data-set name="newRowTemplateConfig" display-name-key="NewRowTemplateConfig">
+      <property-set name="ColumnName" display-name-key="ColumnName" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="DefaultValue" display-name-key="DefaultValue" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="ValueType" display-name-key="ValueType" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="AutoIncrement" display-name-key="AutoIncrement" of-type="TwoOptions" usage="bound" required="false" />
+    </data-set>
+    
+    <!-- Enhanced Column Editor Configuration -->
+    <property name="UseEnhancedEditors" display-name-key="UseEnhancedEditors" of-type="TwoOptions" usage="input" required="false" default-value="false" />
+    <property name="ColumnEditorFormulas" display-name-key="ColumnEditorFormulas" of-type="SingleLine.TextArea" usage="input" required="false" />
+    
+    <!-- Grid Mode Toggle: Grid Edit vs Selection Mode -->
+    <property name="EnableSelectionMode" display-name-key="EnableSelectionMode" of-type="TwoOptions" usage="input" required="false" default-value="false" />
+    
+    <!-- Selection Mode Configuration - Enhanced for Multiple Selection -->
+    <!-- Remove custom Selected and SelectedItems properties - let Power Apps handle them natively through dataset selection -->
+    <!-- Power Apps will automatically provide .Selected and .SelectedItems for dataset-bound controls -->
+    <property name="SelectedCount" display-name-key="SelectedCount" of-type="Whole.None" usage="output" />
+    <property name="SelectAllState" display-name-key="SelectAllState" of-type="Enum" usage="output">
+      <value name="None" display-name-key="None">0</value>
+      <value name="Some" display-name-key="Some">1</value>
+      <value name="All" display-name-key="All">2</value>
+    </property>
+    <property name="SelectionChangedTrigger" display-name-key="SelectionChangedTrigger" of-type="SingleLine.Text" usage="output" />
+    
+    <!-- Filter output events -->
+    <property name="FilterEventName" display-name-key="FilterEventName" of-type="SingleLine.Text" usage="output" />
+    <property name="FilterEventColumn" display-name-key="FilterEventColumn" of-type="SingleLine.Text" usage="output" />
+    <property name="FilterEventValues" display-name-key="FilterEventValues" of-type="SingleLine.Text" usage="output" />
+    <property name="AllFilters" display-name-key="AllFilters" of-type="SingleLine.Text" usage="output" />
+    
+    <!-- Jump To Navigation Properties -->
+    <property name="EnableJumpTo" display-name-key="EnableJumpTo" of-type="TwoOptions" usage="input" required="false" default-value="false" />
+    <property name="JumpToValue" display-name-key="JumpToValue" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="JumpToResult" display-name-key="JumpToResult" of-type="SingleLine.Text" usage="output" />
+    <property name="JumpToRowIndex" display-name-key="JumpToRowIndex" of-type="Whole.None" usage="output" />
+    <property name="JumpToWidth" display-name-key="JumpToWidth" of-type="Whole.None" usage="input" required="false" default-value="200" />
+    
+    <!-- Control Bar Visibility -->
+    <property name="ShowControlBar" display-name-key="ShowControlBar" of-type="TwoOptions" usage="input" required="false" default-value="true" />
+    
+    <!-- Control Bar Text Customization -->
+    <property name="AddNewRowText" display-name-key="AddNewRowText" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="TotalItemsText" display-name-key="TotalItemsText" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="FilterRecordsText" display-name-key="FilterRecordsText" of-type="SingleLine.Text" usage="input" required="false" />
+    
+    <!-- Custom Formula Field Configuration -->
+    <property name="ShowFormulaField" display-name-key="ShowFormulaField" of-type="TwoOptions" usage="input" required="false" default-value="false" />
+    <property name="FormulaFieldText" display-name-key="FormulaFieldText" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="FormulaFieldExpression" display-name-key="FormulaFieldExpression" of-type="Multiple" usage="input" required="false" />
+    <property name="FormulaFieldValue" display-name-key="FormulaFieldValue" of-type="SingleLine.Text" usage="input" required="false" />
+    
+    <resources>
+      <code path="index.ts" order="1" />
+      <resx path="strings/DetailsList.1033.resx" version="1.0.0" />
+      <css path="css/DetailsList.css" order="1" />
+      <platform-library name="React" version="16.14.0" />
+      <platform-library name="Fluent" version="8.121.1" />
+    </resources>
+  </control>
+</manifest>

@@ -1,0 +1,925 @@
+/* VirtualizedEditableGrid - Ultimate Performance CSS */
+/* META/Google competitive virtualized grid with inline editing */
+
+/* Global style for when user is resizing columns */
+.resizing-columns {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: col-resize !important;
+}
+
+.resizing-columns * {
+    cursor: col-resize !important;
+}
+
+.virtualized-editable-grid-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Header Container - Fixed wrapper for transform-based sync */
+.virtualized-header-container {
+    width: 100%;
+    overflow: hidden; /* Changed from overflow-x: auto */
+    overflow-y: hidden;
+    flex-shrink: 0;
+    position: relative;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Header Styles */
+.virtualized-header {
+    display: flex;
+    /* No fixed or minimum height - let inline styles control this completely */
+    background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+    border-bottom: 2px solid #e1dfdd;
+    position: relative;
+    top: 0;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0; /* Prevent header from shrinking */
+    transition: transform 0.1ms linear; /* Smooth transform for scroll sync */
+}
+
+.virtualized-header-cell {
+    height: 100%;
+    /* Padding controlled by inline styles when text wrapping enabled */
+    padding: 2px 12px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #24292f;
+    position: relative;
+}
+
+.virtualized-header-cell::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: transparent;
+    transition: background 0.2s ease;
+}
+
+.virtualized-header-cell:hover {
+    background-color: rgba(9, 105, 218, 0.06);
+    color: #0969da;
+    transform: translateY(-1px);
+}
+
+.virtualized-header-cell:hover::before {
+    background: linear-gradient(90deg, #0969da 0%, #0550ae 100%);
+}
+
+.virtualized-header-cell:last-child {
+    border-right: none;
+}
+
+/* Column Resize Handle */
+.column-resize-handle {
+    position: absolute;
+    top: 0;
+    right: -2px;
+    width: 4px;
+    height: 100%;
+    cursor: col-resize;
+    background: transparent;
+    z-index: 10;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+}
+
+.column-resize-handle:hover {
+    background: linear-gradient(180deg, #0969da 0%, #0550ae 100%);
+    width: 3px;
+    box-shadow: 0 0 8px rgba(9, 105, 218, 0.4);
+}
+
+.virtualized-header-cell.resizing {
+    background: linear-gradient(135deg, rgba(9, 105, 218, 0.1) 0%, rgba(5, 80, 174, 0.1) 100%);
+    box-shadow: 0 2px 8px rgba(9, 105, 218, 0.2);
+    transform: translateY(-1px);
+}
+
+.virtualized-header-cell.resizing .column-resize-handle {
+    background: linear-gradient(180deg, #0969da 0%, #0550ae 100%);
+    width: 3px;
+    box-shadow: 0 0 12px rgba(9, 105, 218, 0.5);
+}
+
+/* Virtualized Grid Body */
+.virtualized-grid-body {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    background-color: #ffffff;
+    min-height: 0; /* Allow proper flex shrinking */
+    width: 100%;
+}
+
+/* Custom scrollbar for performance */
+.virtualized-grid-body::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.virtualized-grid-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 6px;
+}
+
+.virtualized-grid-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.virtualized-grid-body::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* Row Styles */
+.virtualized-row {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e1dfdd;
+    transition: background-color 0.1s ease;
+    cursor: pointer;
+}
+
+.virtualized-row:hover {
+    background-color: #f3f2f1 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.virtualized-row.even {
+    background-color: #ffffff;
+}
+
+.virtualized-row.odd {
+    background-color: #faf9f8;
+}
+
+/* Cell Styles */
+.virtualized-cell {
+    height: 100%;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+    transition: all 0.15s ease;
+}
+
+.virtualized-cell:last-child {
+    border-right: none;
+}
+
+.virtualized-cell.editable {
+    cursor: pointer;
+}
+
+.virtualized-cell.editable:hover {
+    background-color: rgba(0, 120, 212, 0.08);
+    border-radius: 3px;
+    margin: 2px;
+    padding: 0 6px; /* Adjust padding to account for margin */
+}
+
+.virtualized-cell.read-only {
+    cursor: default;
+    background-color: #f8f8f8;
+    color: #605e5c;
+}
+
+/* Change Indicator */
+.virtualized-cell.has-changes {
+    background-color: #fff4ce !important;
+    border-left: 3px solid #ffb900;
+    animation: highlightChange 0.3s ease-in-out;
+}
+
+@keyframes highlightChange {
+    0% {
+        background-color: #ffd700;
+    }
+    100% {
+        background-color: #fff4ce;
+    }
+}
+
+/* Enhanced Drag Fill Handle */
+.drag-fill-handle {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #0969da 0%, #0550ae 100%);
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    cursor: crosshair;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+    box-shadow: 
+        0 2px 6px rgba(9, 105, 218, 0.3),
+        0 0 0 1px rgba(9, 105, 218, 0.1);
+}
+
+.virtualized-cell:hover .drag-fill-handle {
+    opacity: 0.8 !important;
+    transform: scale(1);
+}
+
+.drag-fill-handle:hover {
+    opacity: 1 !important;
+    transform: scale(1.3);
+    box-shadow: 
+        0 4px 12px rgba(9, 105, 218, 0.4),
+        0 0 0 2px rgba(9, 105, 218, 0.2);
+    background: linear-gradient(135deg, #0550ae 0%, #033d8b 100%);
+}
+
+/* Enhanced Inline Editing Styles */
+.virtualized-cell.editing {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%) !important;
+    border: 2px solid #0969da;
+    border-radius: 6px;
+    box-shadow: 
+        0 0 0 3px rgba(9, 105, 218, 0.1),
+        0 4px 16px rgba(9, 105, 218, 0.15),
+        0 1px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transform: scale(1.02);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: visible;
+}
+
+/* Dynamic Dropdown Width Support */
+.virtualized-cell.editing .ms-Dropdown {
+    /* Allow dropdown to size based on content */
+    max-width: 400px; /* Prevent overly wide dropdowns */
+}
+
+.virtualized-cell.editing .ms-Dropdown-container {
+    /* Ensure container respects dynamic width */
+    width: auto !important;
+    max-width: 400px;
+}
+
+.virtualized-cell.editing .ms-Dropdown-title {
+    /* Allow title to size dynamically */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Subtle pulsing animation for active editing */
+.virtualized-cell.editing::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 1px solid #0969da;
+    border-radius: 8px;
+    opacity: 0;
+    animation: editingPulse 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes editingPulse {
+    0%, 100% { 
+        opacity: 0; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.3; 
+        transform: scale(1.02);
+    }
+}
+
+.virtualized-cell .inline-editor {
+    width: 100%;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: inherit;
+    font-family: inherit;
+    color: #24292f;
+    padding: 6px 8px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    line-height: 1.4;
+}
+
+.virtualized-cell .inline-editor:focus {
+    background: rgba(9, 105, 218, 0.02);
+    color: #0969da;
+    font-weight: 500;
+}
+
+/* Enhanced hover state for editable cells */
+.virtualized-cell.editable:hover:not(.editing) {
+    background: rgba(9, 105, 218, 0.04) !important;
+    border: 1px solid rgba(9, 105, 218, 0.2);
+    border-radius: 4px;
+    cursor: text;
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+.virtualized-cell.editable:hover:not(.editing)::after {
+    content: '✏️';
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 10px;
+    opacity: 0.6;
+    pointer-events: none;
+    animation: fadeInEdit 0.2s ease;
+}
+
+@keyframes fadeInEdit {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 0.6; transform: scale(1); }
+}
+
+/* Enhanced Validation States */
+.virtualized-cell.editing.validation-error {
+    border-color: #dc3545;
+    background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 100%) !important;
+    box-shadow: 
+        0 0 0 3px rgba(220, 53, 69, 0.1),
+        0 4px 16px rgba(220, 53, 69, 0.15);
+    animation: validationShake 0.4s ease-in-out;
+}
+
+.virtualized-cell.editing.validation-success {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #f0fff4 0%, #f0fff4 100%) !important;
+    box-shadow: 
+        0 0 0 3px rgba(40, 167, 69, 0.1),
+        0 4px 16px rgba(40, 167, 69, 0.15);
+}
+
+.virtualized-cell.editing.validation-warning {
+    border-color: #ffc107;
+    background: linear-gradient(135deg, #fffbf0 0%, #fffbf0 100%) !important;
+    box-shadow: 
+        0 0 0 3px rgba(255, 193, 7, 0.1),
+        0 4px 16px rgba(255, 193, 7, 0.15);
+}
+
+@keyframes validationShake {
+    0%, 100% { transform: scale(1.02) translateX(0); }
+    25% { transform: scale(1.02) translateX(-2px); }
+    75% { transform: scale(1.02) translateX(2px); }
+}
+
+/* Validation message tooltip */
+.validation-tooltip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #dc3545;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1001;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.validation-tooltip.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Enhanced typing indicator */
+.inline-editor.typing {
+    background: rgba(9, 105, 218, 0.05);
+    position: relative;
+}
+
+.inline-editor.typing::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 3px;
+    background: #0969da;
+    border-radius: 50%;
+    animation: typingPulse 1s ease-in-out infinite;
+}
+
+@keyframes typingPulse {
+    0%, 100% { opacity: 0.3; transform: translateY(-50%) scale(1); }
+    50% { opacity: 1; transform: translateY(-50%) scale(1.5); }
+}
+
+/* Command Bar Customization */
+.virtualized-editable-grid-container .ms-CommandBar {
+    min-height: 40px;
+    margin-bottom: 0px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e1dfdd;
+}
+
+/* Message Bar Customization */
+.virtualized-editable-grid-container .ms-MessageBar {
+    margin-bottom: 0px;
+    border-radius: 4px;
+}
+
+/* Performance Optimizations */
+.virtualized-row,
+.virtualized-cell {
+    will-change: transform;
+    contain: layout style paint;
+}
+
+/* Loading States */
+.virtualized-row.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.virtualized-cell.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Error States */
+.virtualized-cell.error {
+    background-color: #fdf3f4 !important;
+    border-color: #d13438;
+    color: #d13438;
+}
+
+/* Selection States */
+.virtualized-row.selected {
+    background-color: #deecf9 !important;
+    border-color: #0078d4;
+}
+
+.virtualized-row.selected .virtualized-cell {
+    background-color: transparent;
+}
+
+/* Accessibility */
+.virtualized-row:focus {
+    outline: 2px solid #0078d4;
+    outline-offset: -2px;
+}
+
+.virtualized-cell:focus {
+    outline: 1px solid #0078d4;
+    outline-offset: -1px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .virtualized-row {
+        border-bottom: 2px solid;
+    }
+    
+    .virtualized-cell {
+        border-right: 2px solid;
+    }
+    
+    .virtualized-cell.has-changes {
+        border-left: 4px solid;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .virtualized-row,
+    .virtualized-cell,
+    .drag-fill-handle {
+        transition: none;
+    }
+    
+    .virtualized-cell.has-changes {
+        animation: none;
+    }
+}
+
+/* Dark Theme Support */
+[data-theme="dark"] .virtualized-editable-grid-container {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .virtualized-header {
+    background-color: #2d2d30;
+    border-bottom-color: #3e3e42;
+}
+
+[data-theme="dark"] .virtualized-row.even {
+    background-color: #1e1e1e;
+}
+
+[data-theme="dark"] .virtualized-row.odd {
+    background-color: #252526;
+}
+
+[data-theme="dark"] .virtualized-cell {
+    border-right-color: #3e3e42;
+}
+
+[data-theme="dark"] .virtualized-row {
+    border-bottom-color: #3e3e42;
+}
+
+[data-theme="dark"] .virtualized-row:hover {
+    background-color: #2d2d30 !important;
+}
+
+/* Print Styles */
+@media print {
+    .virtualized-editable-grid-container .ms-CommandBar,
+    .drag-fill-handle {
+        display: none;
+    }
+    
+    .virtualized-row {
+        break-inside: avoid;
+        position: static;
+    }
+    
+    .virtualized-grid-body {
+        overflow: visible;
+        height: auto;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .virtualized-header-cell,
+    .virtualized-cell {
+        padding: 0 4px;
+        font-size: 12px;
+    }
+    
+    .drag-fill-handle {
+        width: 8px;
+        height: 8px;
+        opacity: 1;
+    }
+}
+
+/* Ultra-wide screens optimization */
+@media (min-width: 2560px) {
+    .virtualized-cell {
+        min-height: 48px;
+    }
+    
+    .virtualized-header {
+        height: 56px;
+    }
+}
+
+/* Excel-like Column Filter Styles */
+.excel-column-filter-callout {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.excel-filter-container {
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.excel-filter-header {
+    padding: 12px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.excel-filter-search {
+    padding: 4px 0;
+}
+
+.excel-filter-select-all {
+    padding: 4px 0;
+}
+
+.excel-filter-values {
+    height: 200px;
+    overflow: auto;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.excel-filter-value-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 1px solid #f3f2f1;
+}
+
+.excel-filter-value-item:hover {
+    background: #f3f2f1;
+}
+
+.excel-filter-value-checkbox {
+    width: 100%;
+}
+
+.excel-filter-value-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.excel-filter-value-count {
+    color: #666;
+    margin-left: 8px;
+    font-size: 12px;
+}
+
+.excel-filter-actions {
+    padding: 12px;
+    gap: 8px;
+}
+
+/* Filter Button in Header */
+.virtualized-header-filter-button {
+    margin-left: auto;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 4px; /* Reduced to match inline styles */
+    padding: 2px; /* Reduced padding to make button more compact */
+    background: transparent;
+}
+
+.virtualized-header-cell:hover .virtualized-header-filter-button {
+    opacity: 1;
+    background: rgba(9, 105, 218, 0.08);
+    transform: scale(1.05);
+}
+
+.virtualized-header-filter-button.active {
+    opacity: 1;
+    color: #0969da;
+    background: rgba(9, 105, 218, 0.15);
+    box-shadow: 0 2px 6px rgba(9, 105, 218, 0.2);
+}
+
+/* Drag Fill Handle - Only show on cell hover */
+.virtualized-cell:hover .drag-fill-handle {
+    opacity: 0.8 !important;
+}
+
+.drag-fill-handle:hover {
+    opacity: 1 !important;
+    transform: scale(1.2);
+}
+
+/* Row Hover Effects */
+.virtualized-row:hover {
+    background-color: rgba(0, 120, 212, 0.05) !important;
+    transition: background-color 0.15s ease;
+}
+
+.virtualized-row:hover .virtualized-cell {
+    background-color: transparent;
+}
+
+/* Enhanced Filter Icon Styling */
+.virtualized-header-filter-icon {
+    border-radius: 6px;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 20; /* Higher than resize handle */
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.virtualized-header-filter-icon:hover {
+    transform: scale(1.05) translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
+}
+
+.virtualized-header-filter-icon.active {
+    background-color: rgba(0, 120, 212, 0.1) !important;
+    border-color: rgba(0, 120, 212, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(0, 120, 212, 0.2);
+    transform: scale(1.02);
+}
+
+.virtualized-header-filter-icon.active:hover {
+    background-color: rgba(0, 120, 212, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+    transform: scale(1.05) translateY(-1px);
+}
+
+/* Enhanced Column Resize Handle */
+.column-resize-handle {
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 5; /* Lower than filter icon */
+}
+
+.column-resize-handle:hover {
+    background-color: rgba(0, 120, 212, 0.2) !important;
+    box-shadow: 0 0 6px rgba(0, 120, 212, 0.4);
+    transform: scaleX(1.2);
+}
+
+.virtualized-header-cell.resizing .column-resize-handle {
+    background-color: #0078d4 !important;
+    box-shadow: 0 0 8px rgba(0, 120, 212, 0.5);
+    transform: scaleX(1.5);
+}
+
+/* Row Animation and Styling */
+.virtualized-row {
+    transition: all 0.2s ease;
+}
+
+.virtualized-row.even {
+    background-color: transparent;
+}
+
+.virtualized-row.odd {
+    background-color: transparent;
+}
+
+/* Override Enhanced Control Bar Styling - Use compact design */
+.ultimate-enterprise-grid .control-bar {
+    background: #faf9f8 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 2px 12px !important;
+    backdrop-filter: none !important;
+    transition: none !important;
+    border-bottom: 1px solid #e1dfdd;
+}
+
+.ultimate-enterprise-grid .control-bar:hover {
+    box-shadow: none !important;
+    transform: none !important;
+    margin: 0 !important;
+}
+
+/* Enhanced Export Button Styling */
+.control-bar .ms-Button {
+    border-radius: 8px;
+    border: 1.5px solid #d0d7de;
+    background: linear-gradient(135deg, #ffffff 0%, #f6f8fa 100%);
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    height: 36px;
+    min-width: 100px;
+}
+
+.control-bar .ms-Button:hover {
+    background: linear-gradient(135deg, #f6f8fa 0%, #eaeef2 100%);
+    border-color: #0969da;
+    box-shadow: 0 2px 8px rgba(9, 105, 218, 0.15);
+    transform: translateY(-1px);
+}
+
+.control-bar .ms-Button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(9, 105, 218, 0.2);
+}
+
+/* Primary Button (Save Changes) Styling */
+.ms-Button--primary {
+    background: linear-gradient(135deg, #0969da 0%, #0550ae 100%) !important;
+    border: 1.5px solid #0969da !important;
+    box-shadow: 0 2px 8px rgba(9, 105, 218, 0.25) !important;
+}
+
+.ms-Button--primary:hover {
+    background: linear-gradient(135deg, #0550ae 0%, #033d8b 100%) !important;
+    box-shadow: 0 4px 16px rgba(9, 105, 218, 0.35) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Enhanced TextField Styling */
+.control-bar .ms-TextField {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.control-bar .ms-TextField .ms-TextField-field {
+    border: 1.5px solid #d0d7de;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 14px;
+    padding: 10px 12px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.control-bar .ms-TextField .ms-TextField-field:focus {
+    border-color: #0969da;
+    box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1), 0 2px 8px rgba(9, 105, 218, 0.15);
+    background: #ffffff;
+}
+
+.control-bar .ms-TextField .ms-TextField-field::placeholder {
+    color: #656d76;
+    font-style: italic;
+}
+
+/* Enhanced Grid Container */
+.ultimate-enterprise-grid {
+    border: 1px solid #d0d7de;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    transition: box-shadow 0.2s ease;
+}
+
+.ultimate-enterprise-grid:hover {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Enhanced Grid Container */
+.grid-container {
+    border-radius: 8px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* Enhanced Performance Metrics */
+.performance-metrics,
+.formula-field-display {
+    font-size: 13px;
+    font-weight: 500;
+    color: #656d76;
+    background: linear-gradient(135deg, #f6f8fa 0%, #eaeef2 100%);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #d0d7de;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Enhanced Header Gradient */
+.virtualized-header {
+    background: linear-gradient(180deg, #ffffff 0%, #f6f8fa 50%, #eaeef2 100%);
+    border-bottom: 2px solid #d0d7de;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}

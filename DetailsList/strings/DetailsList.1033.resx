@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Microsoft ResX Schema
+
+    Version 2.0
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
+    associated with the data types.
+
+    Example:
+
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+
+    There are any number of "resheader" rows that contain simple
+    name/value pairs.
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
+    mimetype set.
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
+    extensible. For a given mimetype the value must be set accordingly:
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
+    read any of the formats listed below.
+
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="FilteredDetailsListV2" xml:space="preserve">
+    <value>Filtered Details List V2 (%VERSION%)</value>
+    <comment/>
+  </data>
+  <data name="FilteredDetailsListV2_Desc" xml:space="preserve">
+    <value>Enhanced table that uses the Fluent UI DetailsList with filtering capabilities</value>
+    <comment/>
+  </data>
+  <data name="Columns" xml:space="preserve">
+    <value>Columns</value>
+    <comment/>
+  </data>
+  <data name="Records" xml:space="preserve">
+    <value>Records</value>
+    <comment/>
+  </data>
+  <data name="ColDisplayName" xml:space="preserve">
+    <value>Display Name</value>
+    <comment/>
+  </data>
+  <data name="ColName" xml:space="preserve">
+    <value>Name</value>
+    <comment/>
+  </data>
+  <data name="ColWidth" xml:space="preserve">
+    <value>Width</value>
+    <comment/>
+  </data>
+  <data name="ColMultiLine" xml:space="preserve">
+    <value>Multi-Line</value>
+    <comment/>
+  </data>
+  <data name="ColSortable" xml:space="preserve">
+    <value>Sortable</value>
+    <comment/>
+  </data>
+  <data name="ColSortBy" xml:space="preserve">
+    <value>Sort By</value>
+    <comment/>
+  </data>
+  <data name="ColIsBold" xml:space="preserve">
+    <value>Bold</value>
+    <comment/>
+  </data>
+  <data name="ColTagColorColumn" xml:space="preserve">
+    <value>Tag Color</value>
+    <comment/>
+  </data>
+  <data name="ColShowAsSubTextOf" xml:space="preserve">
+    <value>Show As Sub Text Of</value>
+    <comment/>
+  </data>
+  <data name="ColPaddingTop" xml:space="preserve">
+    <value>Padding Top</value>
+    <comment/>
+  </data>
+  <data name="ColPaddingLeft" xml:space="preserve">
+    <value>Padding Top</value>
+    <comment/>
+  </data>
+  <data name="ColLabelAbove" xml:space="preserve">
+    <value>Label Above</value>
+    <comment/>
+  </data>
+  <data name="ColMultiValueDelimiter" xml:space="preserve">
+    <value>Multi Value Delimiter</value>
+    <comment/>
+  </data>
+  <data name="ColFirstMultiValueBold" xml:space="preserve">
+    <value>First Multi Value Bold</value>
+    <comment/>
+  </data>
+  <data name="ColHideWhenBlank" xml:space="preserve">
+    <value>Hide When Blank</value>
+    <comment/>
+  </data>
+  <data name="ColSubTextRow" xml:space="preserve">
+    <value>Sub Text Row</value>
+    <comment/>
+  </data>
+  <data name="ColCellType" xml:space="preserve">
+    <value>Cell Type</value>
+    <comment/>
+  </data>
+  <data name="ColImageWidth" xml:space="preserve">
+    <value>Image Width</value>
+    <comment/>
+  </data>
+  <data name="ColImagePadding" xml:space="preserve">
+    <value>Image Padding</value>
+    <comment/>
+  </data>
+  <data name="ColHeaderPaddingLeft" xml:space="preserve">
+    <value>Header Padding Left</value>
+    <comment/>
+  </data>
+  <data name="SelectionType" xml:space="preserve">
+    <value>Selection type</value>
+    <comment/>
+  </data>
+  <data name="SelectRowsOnFocus" xml:space="preserve">
+    <value>Select rows on focus</value>
+    <comment/>
+  </data>
+  <data name="CurrentSortColumn" xml:space="preserve">
+    <value>Sort column</value>
+    <comment/>
+  </data>
+  <data name="CurrentSortDirection" xml:space="preserve">
+    <value>Sort direction</value>
+    <comment/>
+  </data>
+  <data name="AccessibilityLabel" xml:space="preserve">
+    <value>Accessibility label</value>
+    <comment/>
+  </data>
+  <data name="InputEvent" xml:space="preserve">
+    <value>Input event</value>
+    <comment/>
+  </data>
+  <data name="EventName" xml:space="preserve">
+    <value>Event name</value>
+    <comment/>
+  </data>
+  <data name="SortEventColumn" xml:space="preserve">
+    <value>Sort event column</value>
+    <comment/>
+  </data>
+  <data name="SortEventDirection" xml:space="preserve">
+    <value>Sort event direction</value>
+    <comment/>
+  </data>
+  <data name="RecordKey" xml:space="preserve">
+    <value>Record Key</value>
+    <comment/>
+  </data>
+  <data name="RecordCanSelect" xml:space="preserve">
+    <value>Record can select</value>
+    <comment/>
+  </data>
+  <data name="EventColumn" xml:space="preserve">
+    <value>Event column</value>
+    <comment/>
+  </data>
+  <data name="RaiseOnRowSelectionChangeEvent" xml:space="preserve">
+    <value>Raise OnRowSelectionChange event</value>
+    <comment/>
+  </data>
+  <data name="ColAriaTextColumn" xml:space="preserve">
+    <value>Aria text column</value>
+    <comment/>
+  </data>
+  <data name="ColCellActionDisabledColumn" xml:space="preserve">
+    <value>Action disabled column</value>
+    <comment/>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Theme</value>
+    <comment/>
+  </data>
+  <data name="AlternateRowColor" xml:space="preserve">
+    <value>Alternate Row color</value>
+    <comment/>
+  </data>
+  <data name="PageSize" xml:space="preserve">
+    <value>Page size</value>
+    <comment/>
+  </data>
+  <data name="PageNumber" xml:space="preserve">
+    <value>Page number</value>
+    <comment/>
+  </data>
+  <data name="HeaderVisible" xml:space="preserve">
+    <value>Header visible</value>
+    <comment/>
+  </data>
+  <data name="SelectionAlwaysVisible" xml:space="preserve">
+    <value>Selection radio button visible</value>
+    <comment/>
+  </data>
+  <data name="Message_NoFieldsConfigured" xml:space="preserve">
+    <value>There are no columns defined</value>
+  </data>
+  <data name="Message_ChooseFields" xml:space="preserve">
+    <value>Configure the column layout in the properties panel</value>
+  </data>
+  <data name="HasNextPage" xml:space="preserve">
+    <value>Has next page</value>
+    <comment/>
+  </data>
+  <data name="HasPreviousPage" xml:space="preserve">
+    <value>Has previous page</value>
+    <comment/>
+  </data>
+  <data name="TotalRecords" xml:space="preserve">
+    <value>Total records</value>
+    <comment/>
+  </data>
+  <data name="TotalPages" xml:space="preserve">
+    <value>Total pages</value>
+    <comment/>
+  </data>
+  <data name="EventRowKey" xml:space="preserve">
+    <value>Event row key</value>
+    <comment/>
+  </data>
+  <data name="Compact" xml:space="preserve">
+    <value>Compact</value>
+    <comment/>
+  </data>
+  <data name="LargeDatasetPaging" xml:space="preserve">
+    <value>Large dataset paging</value>
+    <comment/>
+  </data>
+  <data name="EnableFiltering" xml:space="preserve">
+    <value>Enable filtering</value>
+    <comment/>
+  </data>
+  <data name="FilterConfiguration" xml:space="preserve">
+    <value>Filter configuration</value>
+    <comment/>
+  </data>
+  <data name="AppliedFilters" xml:space="preserve">
+    <value>Applied filters</value>
+    <comment/>
+  </data>
+  <data name="FilterRecordsWidth" xml:space="preserve">
+    <value>Filter Records Width</value>
+    <comment/>
+  </data>
+  <data name="FilterEventName" xml:space="preserve">
+    <value>Filter event name</value>
+    <comment/>
+  </data>
+  <data name="FilterEventColumn" xml:space="preserve">
+    <value>Filter event column</value>
+    <comment/>
+  </data>
+  <data name="FilterEventValues" xml:space="preserve">
+    <value>Filter event values</value>
+    <comment/>
+  </data>
+  <data name="AllFilters" xml:space="preserve">
+    <value>All filters</value>
+    <comment/>
+  </data>
+  <data name="ColFilterable" xml:space="preserve">
+    <value>Column filterable</value>
+    <comment/>
+  </data>
+  <data name="ColFilterType" xml:space="preserve">
+    <value>Column filter type</value>
+    <comment/>
+  </data>
+  <data name="HeaderTextSize" xml:space="preserve">
+    <value>Header text size</value>
+    <comment>Controls the font size of column headers</comment>
+  </data>
+  <data name="ColumnTextSize" xml:space="preserve">
+    <value>Column text size</value>
+    <comment>Controls the font size of column data</comment>
+  </data>
+  <data name="EnableHeaderTextWrapping" xml:space="preserve">
+    <value>Enable header text wrapping</value>
+    <comment>When enabled, column header text will wrap when it doesn't fit in the column width</comment>
+  </data>
+  <data name="EditedRecords" xml:space="preserve">
+    <value>Edited records</value>
+    <comment>JSON array of all edited records with changes</comment>
+  </data>
+  <data name="EditedRecordsCount" xml:space="preserve">
+    <value>Edited records count</value>
+    <comment>Number of records that have been edited</comment>
+  </data>
+  <data name="PatchFormula" xml:space="preserve">
+    <value>Patch formula</value>
+    <comment>Ready-to-use Patch formula for saving changes</comment>
+  </data>
+  <data name="ForAllFormula" xml:space="preserve">
+    <value>ForAll formula</value>
+    <comment>Ready-to-use ForAll formula for batch operations</comment>
+  </data>
+  <data name="EditedRecordKeys" xml:space="preserve">
+    <value>Edited record keys</value>
+    <comment>Comma-separated list of edited record IDs</comment>
+  </data>
+  <data name="JumpToWidth" xml:space="preserve">
+    <value>Jump To Width</value>
+    <comment/>
+  </data>
+  <data name="ShowControlBar" xml:space="preserve">
+    <value>Show Control Bar</value>
+    <comment>Controls visibility of the command bar with filters, export, and navigation controls</comment>
+  </data>
+  <data name="AddNewRowText" xml:space="preserve">
+    <value>Add New Row Text</value>
+    <comment>Custom text for the Add New Row button</comment>
+  </data>
+  <data name="TotalItemsText" xml:space="preserve">
+    <value>Total Items Label</value>
+    <comment>Custom text for the Total Items label (e.g. "Total Records:", "Items Found:")</comment>
+  </data>
+  <data name="FilterRecordsText" xml:space="preserve">
+    <value>Filter Records Text</value>
+    <comment>Custom placeholder text for the search/filter input (e.g. "Search records", "Filter data")</comment>
+  </data>
+  <data name="ShowFormulaField" xml:space="preserve">
+    <value>Show Formula Field</value>
+    <comment>Controls visibility of the custom formula calculation field</comment>
+  </data>
+  <data name="FormulaFieldText" xml:space="preserve">
+    <value>Formula Field Label</value>
+    <comment>Display text for the formula field (e.g. "Total Amount:", "Average Score:")</comment>
+  </data>
+  <data name="FormulaFieldExpression" xml:space="preserve">
+    <value>Formula Expression</value>
+    <comment>Formula to calculate values from records (e.g. "SUM(amount)", "COUNT(status='Active')", "AVG(score)")</comment>
+  </data>
+  <data name="FormulaFieldValue" xml:space="preserve">
+    <value>Formula Field Value</value>
+    <comment>Calculated result value from Power Apps to pass to PCF control</comment>
+  </data>
+  
+</root>
