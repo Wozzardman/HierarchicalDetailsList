@@ -80,6 +80,7 @@ export function getMockParameters(): IInputs {
         records: new MockDataSet([]),
         columns: new MockDataSet([]),
         childRecords: new MockDataSet([]),
+        childColumns: new MockDataSet([]),
         
         // Hierarchy properties (input only, output properties are in IOutputs)
         EnableHierarchy: new MockTwoOptionsProperty(false),
