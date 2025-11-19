@@ -383,15 +383,27 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
      */
     private initializeHierarchy(): void {
         try {
-            // Check if childRecords dataset is available
+            // Check if childRecords dataset is available and hierarchy is enabled
             const hasChildDataset = this.context?.parameters?.childRecords !== undefined;
+            const hierarchyEnabled = this.context?.parameters?.EnableHierarchy?.raw === true;
+            const parentKeyColumn = this.context?.parameters?.ParentKeyColumn?.raw;
+            const childKeyColumn = this.context?.parameters?.ChildKeyColumn?.raw;
             
-            if (hasChildDataset) {
-                console.log('🌳 Initializing hierarchy manager...');
+            console.log('🌳 Hierarchy initialization check:', {
+                hasChildDataset,
+                hierarchyEnabled,
+                parentKeyColumn,
+                childKeyColumn
+            });
+            
+            if (hasChildDataset && hierarchyEnabled && parentKeyColumn && childKeyColumn) {
+                console.log(`🌳 Initializing hierarchy: Match when parent.${parentKeyColumn} == child.${childKeyColumn}`);
                 
                 const hierarchyConfig: Partial<HierarchyConfig> = {
                     enabled: true,
-                    autoDetectKeys: true,
+                    parentKeyColumn: parentKeyColumn,
+                    childKeyColumn: childKeyColumn,
+                    autoDetectKeys: false, // Use explicit column names
                     defaultExpandLevel: 0, // Start collapsed
                     indentSize: 24,
                     showExpandCollapseAll: true,
@@ -403,9 +415,14 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
                 this.hierarchyManager = new HierarchyManager(hierarchyConfig);
                 this.hierarchyEnabled = true;
                 
-                console.log('✅ Hierarchy manager initialized');
+                console.log('✅ Hierarchy manager initialized - will group children where child.${childKeyColumn} matches parent.${parentKeyColumn}');
             } else {
-                console.log('ℹ️ No childRecords dataset - hierarchy disabled');
+                console.log('ℹ️ Hierarchy disabled:', {
+                    reason: !hasChildDataset ? 'No childRecords dataset' :
+                            !hierarchyEnabled ? 'EnableHierarchy = false' :
+                            !parentKeyColumn ? 'No ParentKeyColumn specified' :
+                            !childKeyColumn ? 'No ChildKeyColumn specified' : 'Unknown'
+                });
                 this.hierarchyEnabled = false;
             }
         } catch (error) {
@@ -434,12 +451,37 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
             }
 
             // Convert datasets to arrays of records
-            const parentRecords = parentDataset.sortedRecordIds?.map(id => parentDataset.records[id]) || [];
-            const childRecords = childDataset.sortedRecordIds?.map(id => childDataset.records[id]) || [];
+            let parentRecords = parentDataset.sortedRecordIds?.map(id => parentDataset.records[id]) || [];
+            let childRecords = childDataset.sortedRecordIds?.map(id => childDataset.records[id]) || [];
 
-            console.log(`🌳 Updating hierarchy: ${parentRecords.length} parents, ${childRecords.length} children`);
+            console.log(`🌳 Updating hierarchy: ${parentRecords.length} parents (raw), ${childRecords.length} children (raw)`);
             console.log(`🔍 Parent dataset columns:`, parentDataset.columns?.map(c => c.name));
             console.log(`🔍 Child dataset columns:`, childDataset.columns?.map(c => c.name));
+
+            // Check for self-referencing hierarchy (same dataset split by modifier column)
+            const modifierColumn = this.context?.parameters?.ParentReferenceColumn?.raw;
+            if (modifierColumn) {
+                console.log(`🔄 Self-referencing hierarchy detected using modifier column: ${modifierColumn}`);
+                
+                // Filter parent records: only those where modifier column is NULL/empty
+                const filteredParents = childRecords.filter(record => {
+                    const modValue = record.getValue ? record.getValue(modifierColumn) : (record as any)[modifierColumn];
+                    const isEmpty = modValue === null || modValue === undefined || modValue === '' || modValue === 'NULL';
+                    return isEmpty;
+                });
+                
+                // Filter child records: only those where modifier column has a value
+                const filteredChildren = childRecords.filter(record => {
+                    const modValue = record.getValue ? record.getValue(modifierColumn) : (record as any)[modifierColumn];
+                    const hasValue = modValue !== null && modValue !== undefined && modValue !== '' && modValue !== 'NULL';
+                    return hasValue;
+                });
+                
+                console.log(`✂️ Filtered: ${filteredParents.length} parents (${modifierColumn} is empty), ${filteredChildren.length} children (${modifierColumn} has value)`);
+                
+                parentRecords = filteredParents;
+                childRecords = filteredChildren;
+            }
 
             // Initialize hierarchy manager with the datasets
             this.hierarchyManager.initialize(parentRecords, childRecords);

@@ -1371,6 +1371,23 @@ export const VirtualizedEditableGrid = React.forwardRef<VirtualizedEditableGridR
             const group = item.__group;
             const { Icon: ChevronIcon } = require('@fluentui/react/lib/Icon');
             
+            // Calculate left padding to account for special columns that come before data columns
+            let leftPadding = 12;
+            
+            // Count special columns to determine proper indentation
+            const hasNewRows = filteredItems.some(item => item.isNewRow);
+            const hasRowsNeedingAutoFill = pendingAutoFillRows.size > 0;
+            
+            if (enableSelectionMode) {
+                leftPadding += 40; // Selection column width
+            }
+            if (hasRowsNeedingAutoFill) {
+                leftPadding += 40; // Auto-fill confirmation column width
+            }
+            if (onDeleteNewRow && hasNewRows) {
+                leftPadding += 40; // Delete column width
+            }
+            
             return (
                 <div
                     key={`group-${group.key}`}
@@ -1389,9 +1406,11 @@ export const VirtualizedEditableGrid = React.forwardRef<VirtualizedEditableGridR
                         borderBottom: '1px solid #c8c6c4',
                         fontWeight: 600,
                         cursor: 'pointer',
-                        padding: '0 12px',
+                        paddingLeft: `${leftPadding}px`,
+                        paddingRight: '12px',
                         fontSize: '14px',
-                        color: '#201f1e'
+                        color: '#201f1e',
+                        zIndex: 1 // Ensure group header is above regular content
                     }}
                     onClick={() => {
                         if (onToggleGroupCollapse) {
@@ -1404,7 +1423,8 @@ export const VirtualizedEditableGrid = React.forwardRef<VirtualizedEditableGridR
                         style={{
                             marginRight: '8px',
                             fontSize: '12px',
-                            transition: 'transform 0.2s'
+                            transition: 'transform 0.2s',
+                            flexShrink: 0
                         }}
                     />
                     <span>{group.name}</span>

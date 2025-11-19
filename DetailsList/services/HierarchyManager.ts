@@ -118,25 +118,33 @@ export class HierarchyManager {
             return result;
         }
 
-        // Try manual configuration first
+        // Try manual configuration first (simplified two-column matching)
         if (
             this.state.config.parentKeyColumn &&
-            this.state.config.childKeyColumn &&
-            this.state.config.parentReferenceColumn
+            this.state.config.childKeyColumn
         ) {
             const relationship: HierarchyRelationship = {
                 parentKey: this.state.config.parentKeyColumn,
                 childKey: this.state.config.childKeyColumn,
-                referenceColumn: this.state.config.parentReferenceColumn,
+                referenceColumn: this.state.config.childKeyColumn, // Use childKeyColumn as the reference
                 autoDetected: false,
             };
+
+            console.log('🔗 Using simplified matching:', {
+                parentKey: relationship.parentKey,
+                childKey: relationship.childKey,
+                description: `Match when parent.${relationship.parentKey} == child.${relationship.childKey}`
+            });
 
             const matchCount = this.validateRelationship(relationship);
             if (matchCount > 0) {
                 result.canEstablishHierarchy = true;
                 result.relationship = relationship;
                 result.matchCount = matchCount;
+                console.log(`✅ Found ${matchCount} matching relationships`);
                 return result;
+            } else {
+                result.warnings.push(`No matches found using parent.${relationship.parentKey} == child.${relationship.childKey}`);
             }
         }
 
@@ -239,8 +247,14 @@ export class HierarchyManager {
         this.state.childrenCache.clear();
 
         // Create nodes for parent records (root level)
+        console.log(`👨‍👩‍👧‍👦 Creating ${this.parentDataset.length} parent nodes from parentKey: ${relationship.parentKey}`);
+        
         for (const parentRecord of this.parentDataset) {
             const parentId = this.getRecordId(parentRecord, relationship.parentKey);
+            
+            if (this.state.nodes.size < 3) { // Log first 3 for debugging
+                console.log(`  Parent ${this.state.nodes.size + 1}: ID = "${parentId}"`);
+            }
             
             const node: HierarchyNode = {
                 id: parentId,
@@ -262,20 +276,46 @@ export class HierarchyManager {
             this.state.nodes.set(parentId, node);
             this.state.rootIds.push(parentId);
         }
+        
+        console.log(`✅ Created ${this.state.nodes.size} parent nodes`);
 
-        // Map children to parents
+        // Map children to parents using simplified matching
+        // Match: parent[parentKey] == child[childKey]
         const childrenMap = new Map<string, any[]>();
 
+        console.log(`🔗 Processing ${this.childDataset.length} child records, looking for matches with childKey: ${relationship.childKey}`);
+        
+        let sampleCount = 0;
         for (const childRecord of this.childDataset) {
-            const parentRef = childRecord[relationship.referenceColumn];
-            if (!parentRef) continue;
+            // Get the value from child record that should match parent's key
+            let childMatchValue;
+            if (childRecord.getValue && typeof childRecord.getValue === 'function') {
+                childMatchValue = childRecord.getValue(relationship.childKey);
+            } else {
+                childMatchValue = childRecord[relationship.childKey];
+            }
+            
+            if (sampleCount < 3) { // Log first 3 for debugging
+                console.log(`  Child ${sampleCount + 1}: childKey(${relationship.childKey}) = "${childMatchValue}" (looking for parent with this ID)`);
+                sampleCount++;
+            }
+            
+            if (childMatchValue === null || childMatchValue === undefined) {
+                if (sampleCount < 5) {
+                    console.log('⚠️ Child record missing match value:', relationship.childKey);
+                }
+                continue;
+            }
 
-            const parentId = String(parentRef);
+            const parentId = String(childMatchValue);
             if (!childrenMap.has(parentId)) {
                 childrenMap.set(parentId, []);
             }
             childrenMap.get(parentId)!.push(childRecord);
         }
+        
+        console.log(`📊 Child records mapped to ${childrenMap.size} unique parent IDs:`, Array.from(childrenMap.keys()).slice(0, 5));
+        console.log(`📊 Parent IDs available:`, Array.from(this.state.nodes.keys()).slice(0, 5));
 
         // Create child nodes and link to parents
         for (const [parentId, children] of childrenMap.entries()) {
@@ -320,7 +360,24 @@ export class HierarchyManager {
      * Get record ID with fallback
      */
     private getRecordId(record: any, keyColumn: string): string {
-        return String(record[keyColumn] || record.id || record.ID || Math.random());
+        // Support PCF DataSetRecord with getValue method
+        if (record.getValue && typeof record.getValue === 'function') {
+            const value = record.getValue(keyColumn);
+            if (value !== null && value !== undefined) {
+                return String(value);
+            }
+            // If getValue returns null/undefined, the column might not exist or has no value
+            console.warn(`⚠️ getValue("${keyColumn}") returned null/undefined for record`);
+        }
+        
+        // Fallback to direct property access for plain objects
+        if (record[keyColumn] !== null && record[keyColumn] !== undefined) {
+            return String(record[keyColumn]);
+        }
+        
+        // Last resort: use record ID with warning
+        console.warn(`⚠️ Column "${keyColumn}" not found, falling back to record.id`);
+        return String(record.id || record.ID || Math.random());
     }
 
     /**

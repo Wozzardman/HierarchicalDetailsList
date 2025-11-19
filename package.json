@@ -1,6 +1,6 @@
 {
   "name": "powerapps-hierarchical-detailslist",
-  "version": "1.0.4",
+  "version": "1.0.10",
   "description": "Enterprise-grade PowerApps Component Framework (PCF) control with advanced filtering, virtualization, hierarchy, and industry-leading performance.",
   "author": "Josh VanTimmeren",
   "keywords": [
