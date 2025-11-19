@@ -98,6 +98,13 @@ export interface IUltimateEnterpriseGridProps {
     formulaFieldText?: string;
     formulaFieldExpression?: string;
     
+    // Hierarchy configuration
+    enableHierarchy?: boolean;
+    hierarchyIndentSize?: number;
+    onToggleHierarchyExpand?: (nodeId: string) => void;
+    onExpandAllHierarchy?: () => void;
+    onCollapseAllHierarchy?: () => void;
+    
     className?: string;
     theme?: 'light' | 'dark' | 'high-contrast';
     locale?: string;
@@ -167,6 +174,13 @@ export const UltimateEnterpriseGrid: React.FC<IUltimateEnterpriseGridProps> = ({
     showFormulaField = false,
     formulaFieldText = 'Formula Result:',
     formulaFieldExpression = '',
+    
+    // Hierarchy props
+    enableHierarchy = false,
+    hierarchyIndentSize = 24,
+    onToggleHierarchyExpand,
+    onExpandAllHierarchy,
+    onCollapseAllHierarchy,
     
     className = '',
     theme = 'light',

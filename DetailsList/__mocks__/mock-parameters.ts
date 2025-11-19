@@ -79,5 +79,16 @@ export function getMockParameters(): IInputs {
         
         records: new MockDataSet([]),
         columns: new MockDataSet([]),
+        childRecords: new MockDataSet([]),
+        
+        // Hierarchy properties (input only, output properties are in IOutputs)
+        EnableHierarchy: new MockTwoOptionsProperty(false),
+        ParentKeyColumn: new MockStringProperty(),
+        ChildKeyColumn: new MockStringProperty(),
+        ParentReferenceColumn: new MockStringProperty(),
+        AutoDetectKeys: new MockTwoOptionsProperty(true),
+        DefaultExpandLevel: new MockWholeNumberProperty(0),
+        IndentSize: new MockWholeNumberProperty(20),
+        ShowExpandCollapseAll: new MockTwoOptionsProperty(true),
     };
 }

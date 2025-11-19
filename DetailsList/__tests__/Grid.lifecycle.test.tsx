@@ -23,7 +23,7 @@ describe('HierarchicalDetailsListV1', () => {
 });
 
 function createComponent() {
-    const component = new FilteredDetailsListV2();
+    const component = new HierarchicalDetailsListV1();
     const notifyOutputChanged = jest.fn();
     const context = new MockContext<IInputs>(getMockParameters());
 

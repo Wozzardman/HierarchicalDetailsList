@@ -3,7 +3,7 @@ import { DefaultButton, IColumn, Image, IRawStyle, Link, mergeStyles } from '@fl
 import * as React from 'react';
 import { IGridColumn } from './Component.types';
 import { DatasetArray } from './DatasetArrayItem';
-import { ClassNames, FontStyles } from './Grid.styles';
+import { classNames, FontStyles } from './Grid.styles';
 import { CellTypes } from './ManifestConstants';
 
 const CSS_IMPORTANT = ' !important';
@@ -76,7 +76,7 @@ export const GridCell = React.memo((props: GridCellProps) => {
                                 const moreCols = colIndex < cellCols.length - 1;
                                 return wrapContent(cellContents, c, isBlank, moreCols);
                             })}
-                            {moreRows && <span className={ClassNames.subTextRowBreak}></span>}
+                            {moreRows && <span className={classNames.subTextRowBreak}></span>}
                         </React.Fragment>
                     );
                 })}
@@ -147,7 +147,7 @@ function wrapContent(cellContents: JSX.Element, column: IGridColumn, isBlank: bo
     const labelAbove = hasInlineLabel && column.isLabelAbove === true;
     cellContents = !isBlank ? (
         <span className={mergeStyles(cellStyle)} key={column.key.toString()}>
-            {hasInlineLabel && <span className={ClassNames.inlineLabel}>{column.inlineLabel || column.name}</span>}
+            {hasInlineLabel && <span className={classNames.inlineLabel}>{column.inlineLabel || column.name}</span>}
             {labelAbove && <br />}
             {cellContents}
         </span>
@@ -170,7 +170,7 @@ function getColorTagCell(
 
     const tagColor = getCellValue<string>(column.tagColor, item)[0];
 
-    const indicatorColorClass = `${ClassNames.statusTag} ${mergeStyles({
+    const indicatorColorClass = `${classNames.statusTag} ${mergeStyles({
         ':after': { background: tagColor + CSS_IMPORTANT },
     })}`;
     const tagText = getCellValue<string>(column.fieldName, item)[0];
@@ -192,7 +192,7 @@ function getTextTagCell(
     const tagText = getCellValue<string>(column.fieldName, item)[0];
     const tagColor = getCellValue<string>(column.tagColor, item)[0];
     const tagBorderColor = getCellValue<string>(column.tagBorderColor, item)[0];
-    const tagColorClass = `${ClassNames.textTag} ${mergeStyles({
+    const tagColorClass = `${classNames.textTag} ${mergeStyles({
         background: tagColor || '#F4F6F7' + CSS_IMPORTANT,
         borderColor: (tagBorderColor || '#CAD0D5') + CSS_IMPORTANT,
     })}`;
@@ -224,7 +224,7 @@ function getIconCell(
             const buttonContent: JSX.Element | null = getImageTag(imageData, column, iconColor);
             const padding = column.imagePadding || undefined;
             if (column.cellType?.toLowerCase() === CellTypes.ClickableImage) {
-                const containerClass = `${ClassNames.imageButton} ${mergeStyles({ padding: padding })}`;
+                const containerClass = `${classNames.imageButton} ${mergeStyles({ padding: padding })}`;
                 cellContents = (
                     <DefaultButton
                         onClick={cellNavigation}
@@ -286,7 +286,7 @@ function getExpandIconCell(
         const icon = expanded ? 'ChevronUp' : 'ChevronDown';
         return (
             <DefaultButton
-                className={ClassNames.expandIcon}
+                className={classNames.expandIcon}
                 ariaLabel={expanded ? 'Collapse' : 'Expand'}
                 data-is-focusable={true}
                 text={expanded ? '▲' : '▼'}

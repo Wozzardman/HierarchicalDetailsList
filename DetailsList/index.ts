@@ -440,24 +440,14 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
             console.log(`🌳 Updating hierarchy: ${parentRecords.length} parents, ${childRecords.length} children`);
 
             // Initialize hierarchy manager with the datasets
-            const detectionResult = this.hierarchyManager.initialize(parentRecords, childRecords);
-
-            if (detectionResult.canEstablishHierarchy) {
-                console.log(`✅ Hierarchy established: ${detectionResult.matchCount} relationships found`);
-                console.log(`   Relationship:`, detectionResult.relationship);
-                
-                // Store expanded state
-                this.hierarchyExpandedKeys = this.hierarchyManager.getExpandedIds();
-                
-                // Update child count for output
-                const state = this.hierarchyManager.getState();
-                this.hierarchyChildRecordCount = state.visibleCount;
-            } else {
-                console.warn('⚠️ Could not establish hierarchy:', detectionResult.warnings);
-                if (detectionResult.suggestedConfig) {
-                    console.log('💡 Suggested configuration:', detectionResult.suggestedConfig);
-                }
-            }
+            this.hierarchyManager.initialize(parentRecords, childRecords);
+            
+            // Store expanded state
+            const state = this.hierarchyManager.getState();
+            this.hierarchyExpandedKeys = Array.from(state.expandedIds);
+            this.hierarchyChildRecordCount = state.visibleCount;
+            
+            console.log(`✅ Hierarchy initialized: ${state.totalNodes} nodes, ${state.visibleCount} visible`);
         } catch (error) {
             console.error('❌ Error updating hierarchy data:', error);
         }
@@ -470,10 +460,11 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
         if (!this.hierarchyManager) return;
 
         try {
-            this.hierarchyManager.toggleExpand(nodeId);
+            this.hierarchyManager.toggleNode(nodeId);
             
             // Update state
-            this.hierarchyExpandedKeys = this.hierarchyManager.getExpandedIds();
+            const state = this.hierarchyManager.getState();
+            this.hierarchyExpandedKeys = Array.from(state.expandedIds);
             this.hierarchyExpandEvent = 'expand';
             this.hierarchyExpandedRowKey = nodeId;
             
@@ -494,7 +485,8 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
 
         try {
             this.hierarchyManager.expandAll();
-            this.hierarchyExpandedKeys = this.hierarchyManager.getExpandedIds();
+            const state = this.hierarchyManager.getState();
+            this.hierarchyExpandedKeys = Array.from(state.expandedIds);
             this.hierarchyExpandEvent = 'expandAll';
             this.notifyOutputChanged();
             
@@ -512,7 +504,8 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
 
         try {
             this.hierarchyManager.collapseAll();
-            this.hierarchyExpandedKeys = this.hierarchyManager.getExpandedIds();
+            const state = this.hierarchyManager.getState();
+            this.hierarchyExpandedKeys = Array.from(state.expandedIds);
             this.hierarchyExpandEvent = 'collapseAll';
             this.notifyOutputChanged();
             
