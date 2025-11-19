@@ -256,6 +256,7 @@ export class HierarchyManager {
                 isLoading: false,
                 path: [parentId],
                 isVisible: true,
+                datasetType: 'parent', // Tag as parent record
             };
 
             this.state.nodes.set(parentId, node);
@@ -302,6 +303,7 @@ export class HierarchyManager {
                     isLoading: false,
                     path: [parentId, childId],
                     isVisible: false, // Children start hidden
+                    datasetType: 'child', // Tag as child record
                 };
 
                 this.state.nodes.set(childId, childNode);

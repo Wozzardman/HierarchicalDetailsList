@@ -98,10 +98,10 @@ export interface IUltimateEnterpriseGridProps {
     formulaFieldText?: string;
     formulaFieldExpression?: string;
     
-    // Hierarchy configuration
+    // Hierarchy configuration (FluentUI native groups)
     enableHierarchy?: boolean;
-    hierarchyIndentSize?: number;
-    onToggleHierarchyExpand?: (nodeId: string) => void;
+    groups?: any[]; // FluentUI IGroup array for native hierarchy support
+    onToggleGroupCollapse?: (group: any) => void;
     onExpandAllHierarchy?: () => void;
     onCollapseAllHierarchy?: () => void;
     
@@ -175,10 +175,10 @@ export const UltimateEnterpriseGrid: React.FC<IUltimateEnterpriseGridProps> = ({
     formulaFieldText = 'Formula Result:',
     formulaFieldExpression = '',
     
-    // Hierarchy props
+    // Hierarchy props (FluentUI native groups)
     enableHierarchy = false,
-    hierarchyIndentSize = 24,
-    onToggleHierarchyExpand,
+    groups,
+    onToggleGroupCollapse,
     onExpandAllHierarchy,
     onCollapseAllHierarchy,
     
@@ -956,6 +956,7 @@ export const UltimateEnterpriseGrid: React.FC<IUltimateEnterpriseGridProps> = ({
                     ref={gridRef}
                     items={filteredItems}
                     columns={columns}
+                    groups={groups} // FluentUI native groups for hierarchy
                     height="100%" // Let the grid flex with its container
                     width={(typeof width === 'number' && width > 0) ? width : '100%'}
                     enableInlineEditing={enableInlineEditing}
@@ -963,6 +964,9 @@ export const UltimateEnterpriseGrid: React.FC<IUltimateEnterpriseGridProps> = ({
                     useEnhancedEditors={useEnhancedEditors}
                     columnEditorMapping={columnEditorMapping}
                     getAvailableValues={getAvailableValues}
+                    
+                    // Hierarchy props
+                    onToggleGroupCollapse={onToggleGroupCollapse}
                     
                     // Column filter props
                     onColumnFilter={handleColumnFilterChange}

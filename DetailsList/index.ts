@@ -420,7 +420,7 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
     private updateHierarchyData(
         context: ComponentFramework.Context<IInputs>,
         parentDataset: ComponentFramework.PropertyTypes.DataSet,
-        columns: ComponentFramework.PropertyTypes.DataSet
+        columns: ComponentFramework.PropertyTypes.DataSet | null
     ): void {
         if (!this.hierarchyManager) return;
 
@@ -438,6 +438,8 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
             const childRecords = childDataset.sortedRecordIds?.map(id => childDataset.records[id]) || [];
 
             console.log(`🌳 Updating hierarchy: ${parentRecords.length} parents, ${childRecords.length} children`);
+            console.log(`🔍 Parent dataset columns:`, parentDataset.columns?.map(c => c.name));
+            console.log(`🔍 Child dataset columns:`, childDataset.columns?.map(c => c.name));
 
             // Initialize hierarchy manager with the datasets
             this.hierarchyManager.initialize(parentRecords, childRecords);
@@ -478,6 +480,31 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
     }
 
     /**
+     * Handle FluentUI group toggle (wrapper for toggleHierarchyExpansion)
+     */
+    private handleGroupToggle(group: any): void {
+        if (!this.hierarchyManager || !group?.data?.nodeId) return;
+
+        try {
+            const nodeId = group.data.nodeId;
+            this.hierarchyManager.toggleNode(nodeId);
+            
+            // Update state
+            const state = this.hierarchyManager.getState();
+            this.hierarchyExpandedKeys = Array.from(state.expandedIds);
+            this.hierarchyExpandEvent = 'expand';
+            this.hierarchyExpandedRowKey = nodeId;
+            
+            // Trigger output update
+            this.notifyOutputChanged();
+            
+            console.log(`🌳 Toggled group: ${group.name} (${nodeId})`);
+        } catch (error) {
+            console.error('❌ Error toggling group:', error);
+        }
+    }
+
+    /**
      * Expand all hierarchy nodes
      */
     private expandAllHierarchy(): void {
@@ -494,6 +521,133 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
         } catch (error) {
             console.error('❌ Error expanding all:', error);
         }
+    }
+
+    /**
+     * Build FluentUI IGroup structure from hierarchy manager
+     * This converts our HierarchyNode tree into FluentUI's native group format
+     */
+    private buildHierarchyGroupsAndItems(): { items: any[], groups: any[] } {
+        if (!this.hierarchyManager) {
+            return { items: [], groups: [] };
+        }
+
+        const state = this.hierarchyManager.getState();
+        const items: any[] = [];
+        const groups: any[] = [];
+        let currentIndex = 0;
+
+        // Process each root node and its children
+        for (const rootId of state.rootIds) {
+            const rootNode = state.nodes.get(rootId);
+            if (!rootNode) continue;
+
+            // Add parent item
+            const parentRecord = rootNode.data;
+            if (parentRecord) {
+                items.push(this.createEnhancedRecord(parentRecord, rootNode.id, rootNode.datasetType));
+            }
+
+            // Create group for this parent and its children
+            const childItems: any[] = [];
+            if (rootNode.hasChildren && rootNode.isExpanded) {
+                // Add all child items
+                for (const childId of rootNode.childIds) {
+                    const childNode = state.nodes.get(childId);
+                    if (childNode && childNode.data) {
+                        childItems.push(this.createEnhancedRecord(childNode.data, childNode.id, childNode.datasetType));
+                    }
+                }
+            }
+
+            // Create FluentUI IGroup
+            const group: any = {
+                key: rootNode.id,
+                name: this.getGroupName(parentRecord), // Extract display name from record
+                startIndex: currentIndex,
+                count: 1 + childItems.length, // Parent + children
+                level: 0,
+                isCollapsed: !rootNode.isExpanded,
+                data: {
+                    nodeId: rootNode.id,
+                    hasChildren: rootNode.hasChildren,
+                    childCount: rootNode.childCount,
+                    datasetType: rootNode.datasetType
+                }
+            };
+
+            groups.push(group);
+            
+            // Add all child items to the flat items array
+            items.push(...childItems);
+            currentIndex += 1 + childItems.length;
+        }
+
+        return { items, groups };
+    }
+
+    /**
+     * Create enhanced record with PCF compatibility
+     */
+    private createEnhancedRecord(record: any, id: string, datasetType?: 'parent' | 'child'): any {
+        return {
+            ...record,
+            recordId: id,
+            key: id,
+            datasetType: datasetType,
+            // Add a getter method for the grid to access values by column name
+            getValueByColumn: (columnName: string) => {
+                try {
+                    return record.getValue(columnName);
+                } catch (e) {
+                    return null;
+                }
+            },
+            // Add a getter for formatted values (for display)
+            getFormattedValueByColumn: (columnName: string) => {
+                try {
+                    return record.getFormattedValue(columnName);
+                } catch (e) {
+                    return null;
+                }
+            }
+        };
+    }
+
+    /**
+     * Extract group display name from record
+     * Tries common column names for the display value
+     */
+    private getGroupName(record: any): string {
+        if (!record) return 'Group';
+        
+        // Try common name columns
+        const nameColumns = ['name', 'Name', 'title', 'Title', 'label', 'Label'];
+        for (const colName of nameColumns) {
+            try {
+                const value = record.getValue ? record.getValue(colName) : record[colName];
+                if (value) return String(value);
+            } catch (e) {
+                // Continue to next column
+            }
+        }
+        
+        // Fallback: use first non-ID column value
+        try {
+            const columns = Object.keys(record);
+            for (const col of columns) {
+                if (!col.toLowerCase().includes('id') && !col.startsWith('_')) {
+                    const value = record.getValue ? record.getValue(col) : record[col];
+                    if (value && typeof value !== 'function') {
+                        return String(value);
+                    }
+                }
+            }
+        } catch (e) {
+            // Fallback
+        }
+        
+        return 'Group';
     }
 
     /**
@@ -659,9 +813,9 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
             columns = context.parameters.columns;
         }
 
-        // Validate datasets are available before proceeding
-        if (!dataset || !columns) {
-            console.warn('⚠️ Dataset or columns not available, returning empty grid');
+        // Validate that the main dataset is available (columns dataset is optional)
+        if (!dataset) {
+            console.warn('⚠️ Dataset not available, returning empty grid');
             return React.createElement(UltimateEnterpriseGrid, {
                 items: [],
                 columns: [],
@@ -686,15 +840,17 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
             });
         }
 
-        // Set column limit to 150 for the selected columns dataset
-        try {
-            if (columns?.paging && columns.paging.pageSize !== HierarchicalDetailsListV1.COLUMN_LIMIT) {
-                columns.paging.setPageSize(HierarchicalDetailsListV1.COLUMN_LIMIT);
-                columns.refresh();
+        // Set column limit to 150 for the selected columns dataset (if configured)
+        if (columns) {
+            try {
+                if (columns.paging && columns.paging.pageSize !== HierarchicalDetailsListV1.COLUMN_LIMIT) {
+                    columns.paging.setPageSize(HierarchicalDetailsListV1.COLUMN_LIMIT);
+                    columns.refresh();
+                }
+            } catch (columnError) {
+                console.warn('⚠️ Error setting column page size:', columnError);
+                // Continue processing - this is not a critical error
             }
-        } catch (columnError) {
-            console.warn('⚠️ Error setting column page size:', columnError);
-            // Continue processing - this is not a critical error
         }
 
         // Clear error state if we reach this point successfully
@@ -706,7 +862,7 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
         }
 
         // Handle loading state - show loading overlay instead of error messages
-        if (dataset.loading || columns.loading) {
+        if (dataset.loading || (columns && columns.loading)) {
             this.startLoading('Loading data...');
             console.log('📊 Datasets still loading, showing loading overlay');
             
@@ -738,7 +894,7 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
         console.log('Dataset loading:', dataset.loading);
         console.log('Dataset initialized:', dataset.paging.totalResultCount);
         console.log('Dataset record count:', dataset.sortedRecordIds?.length || 0);
-        console.log('Dataset columns count:', columns.sortedRecordIds?.length || 0);
+        console.log('Dataset columns count:', columns?.sortedRecordIds?.length || 0);
         console.log('Allocated width:', context.mode.allocatedWidth);
         console.log('Allocated height:', context.mode.allocatedHeight);
         console.log('📐 SIZING DEBUG - Using dimensions:', {
@@ -772,7 +928,7 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
         const datasetNotInitialized = this.records === undefined;
         const datasetChanged =
             !dataset.loading &&
-            !columns.loading &&
+            (!columns || !columns.loading) &&
             (context.updatedProperties.indexOf('dataset') > -1 ||
                 context.updatedProperties.indexOf('records_dataset') > -1 ||
                 context.updatedProperties.indexOf('columns_dataset') > -1);
@@ -781,7 +937,7 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
             // === PCF DATASET DEBUG ===
             console.log('=== PCF DATASET DEBUG ===');
             console.log('Dataset loading:', dataset.loading);
-            console.log('Columns loading:', columns.loading);
+            console.log('Columns loading:', columns?.loading || 'N/A (not configured)');
             console.log('Dataset records count:', Object.keys(dataset.records || {}).length);
             console.log('Dataset columns count:', dataset.columns?.length || 0);
             console.log(
@@ -793,9 +949,9 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
                     alias: (col as any).alias,
                 })),
             );
-            console.log('Columns records count:', Object.keys(columns.records || {}).length);
+            console.log('Columns records count:', Object.keys(columns?.records || {}).length);
             console.log('sortedRecordIds sample:', dataset.sortedRecordIds?.slice(0, 3));
-            console.log('sortedColumnIds:', columns.sortedRecordIds);
+            console.log('sortedColumnIds:', columns?.sortedRecordIds || 'N/A (not configured)');
 
             // Check if we're in test harness with placeholder data
             const isTestHarnessData = this.isTestHarnessData(dataset, columns);
@@ -819,7 +975,7 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
                     });
 
                     // Also check column configuration
-                    if (columns.sortedRecordIds && columns.sortedRecordIds.length > 0) {
+                    if (columns && columns.sortedRecordIds && columns.sortedRecordIds.length > 0) {
                         console.log('Column configuration details:');
                         columns.sortedRecordIds.slice(0, 3).forEach((colId) => {
                             const colConfig = columns.records[colId];
@@ -836,6 +992,8 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
                                 }
                             }
                         });
+                    } else {
+                        console.log('⚠️ No Columns dataset configured - will use Fields editor columns');
                     }
                 }
             }
@@ -862,10 +1020,14 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
                 const convertedColumns = this.convertLegacyFieldsToColumns(columns);
                 this.columns = convertedColumns.records;
                 this.sortedColumnsIds = convertedColumns.sortedRecordIds;
-            } else {
+            } else if (columns && columns.records) {
                 console.log('🆕 Processing modern columns dataset');
                 this.columns = columns.records;
                 this.sortedColumnsIds = columns.sortedRecordIds;
+            } else {
+                console.log('📋 No Columns dataset configured - will use Fields editor');
+                this.columns = {};
+                this.sortedColumnsIds = [];
             }
 
             // Process column definitions from the columns dataset (not the records dataset metadata)
@@ -950,9 +1112,9 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
 
             this.datasetColumns = processedColumns;
 
-            // Update hierarchy if enabled
+            // Update hierarchy if enabled (columns parameter may be undefined)
             if (this.hierarchyEnabled && this.hierarchyManager) {
-                this.updateHierarchyData(context, dataset, columns);
+                this.updateHierarchyData(context, dataset, columns || null);
             }
 
             // Initialize filters from input if provided
@@ -991,49 +1153,20 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
 
         // Convert records to items for UltimateEnterpriseGrid
         // Keep the PCF EntityRecord structure intact for proper data type handling
-        // If hierarchy is enabled, use hierarchical node data instead
+        // Build FluentUI IGroup structure for hierarchy if enabled
         let items: any[];
+        let groups: any[] | undefined = undefined;
         
-        if (this.hierarchyEnabled && this.hierarchyManager) {
-            // Get visible nodes from hierarchy manager
-            const visibleNodes = this.hierarchyManager.getVisibleNodes();
-            console.log(`🌳 Using hierarchical data: ${visibleNodes.length} visible nodes`);
-            
-            items = visibleNodes.map(node => {
-                const record = node.data;
-                if (!record) return null;
-                
-                // Return the PCF EntityRecord with hierarchy metadata
-                const enhancedRecord = {
-                    ...record,
-                    recordId: node.id,
-                    key: node.id,
-                    // Hierarchy properties
-                    hierarchyNode: node,
-                    hierarchyLevel: node.level,
-                    hasChildren: node.hasChildren,
-                    isExpanded: node.isExpanded,
-                    childCount: node.childCount,
-                    // Add a getter method for the grid to access values by column name
-                    getValueByColumn: (columnName: string) => {
-                        try {
-                            return record.getValue(columnName);
-                        } catch (e) {
-                            return null;
-                        }
-                    },
-                    // Add a getter for formatted values (for display)
-                    getFormattedValueByColumn: (columnName: string) => {
-                        try {
-                            return record.getFormattedValue(columnName);
-                        } catch (e) {
-                            return null;
-                        }
-                    }
-                };
-                
-                return enhancedRecord;
-            }).filter(item => item !== null);
+        // Check if hierarchy is both enabled AND has data to display
+        const hierarchyState = this.hierarchyEnabled && this.hierarchyManager ? this.hierarchyManager.getState() : null;
+        const hasHierarchyData = hierarchyState !== null && hierarchyState.totalNodes > 0;
+        
+        if (hasHierarchyData && this.hierarchyManager) {
+            // Build flat items array and FluentUI groups structure
+            const result = this.buildHierarchyGroupsAndItems();
+            items = result.items;
+            groups = result.groups;
+            console.log(`🌳 Using FluentUI groups: ${groups.length} groups, ${items.length} total items`);
         } else {
             // Standard flat list
             items = this.sortedRecordsIds.map(recordId => {
@@ -1106,7 +1239,44 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
         console.log('📋 Enhanced records for grid (preserving data types):', items.slice(0, 1)); // Log first item for debugging
         
         // Convert columns to UltimateEnterpriseGrid format using actual data columns
-        const actualDataColumns = dataset.columns || [];
+        // When hierarchy is enabled, create a unified column set that includes ALL columns from both datasets
+        let actualDataColumns = dataset.columns || [];
+        const columnSourceMap = new Map<string, 'parent' | 'child' | 'both'>(); // Track which dataset each column belongs to
+        
+        // Initialize parent columns
+        actualDataColumns.forEach(col => {
+            columnSourceMap.set(col.name, 'parent');
+        });
+        
+        // Add child dataset columns if hierarchy is enabled
+        if (this.hierarchyEnabled && context.parameters.childRecords) {
+            const childDataset = context.parameters.childRecords;
+            const childColumns = childDataset.columns || [];
+            
+            if (childColumns.length > 0) {
+                console.log(`🌳 Parent dataset has ${actualDataColumns.length} columns, child has ${childColumns.length} columns`);
+                
+                // Create a map of existing parent columns by name
+                const parentColumnMap = new Map(actualDataColumns.map(col => [col.name, col]));
+                
+                // Process child columns
+                childColumns.forEach(childCol => {
+                    if (parentColumnMap.has(childCol.name)) {
+                        // Column exists in both datasets
+                        columnSourceMap.set(childCol.name, 'both');
+                        console.log(`🔗 Shared column: ${childCol.name} (${childCol.displayName})`);
+                    } else {
+                        // Child-only column
+                        columnSourceMap.set(childCol.name, 'child');
+                        actualDataColumns.push(childCol);
+                        console.log(`➕ Child-only column: ${childCol.name} (${childCol.displayName})`);
+                    }
+                });
+                
+                console.log(`✅ Total unified column count: ${actualDataColumns.length}`);
+            }
+        }
+        
         const metadataColumns = [
             RecordsColumns.RecordKey,
             RecordsColumns.RecordCanSelect,
@@ -1190,11 +1360,17 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
                     isVisible: isVisible,
                     // Add PCF-specific properties for proper data access
                     pcfDataType: col.dataType,
-                    pcfColumnName: col.name
+                    pcfColumnName: col.name,
+                    // Add column source metadata for hierarchy support
+                    columnSource: columnSourceMap.get(col.name) || 'parent'
                 };
             });
             
-        console.log(`✅ Final grid columns: ${gridColumns.length}`, gridColumns.map(c => ({ name: c.name, visible: (c as any).isVisible })));
+        console.log(`✅ Final grid columns: ${gridColumns.length}`, gridColumns.map(c => ({ 
+            name: c.name, 
+            visible: (c as any).isVisible,
+            source: (c as any).columnSource 
+        })));
 
         // Create a wrapper for handleCellEdit to match the expected signature
         const onCellEditWrapper = (item: any, column: any, newValue: any) => {
@@ -1431,10 +1607,10 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
             enableExcelClipboard: (context.parameters as any).EnableExcelClipboard?.raw || false,
             onClipboardOperation: this.handleClipboardOperation,
             
-            // Hierarchy configuration
+            // Hierarchy configuration with FluentUI groups integration
             enableHierarchy: this.hierarchyEnabled,
-            hierarchyIndentSize: 24,
-            onToggleHierarchyExpand: this.toggleHierarchyExpansion.bind(this),
+            groups: groups, // Pass FluentUI groups for integrated rendering
+            onToggleGroupCollapse: this.handleGroupToggle.bind(this), // Handle group expand/collapse
             onExpandAllHierarchy: this.expandAllHierarchy.bind(this),
             onCollapseAllHierarchy: this.collapseAllHierarchy.bind(this),
             

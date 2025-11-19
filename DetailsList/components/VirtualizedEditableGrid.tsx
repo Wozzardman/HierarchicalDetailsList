@@ -97,9 +97,11 @@ const formatCellValue = (value: any, dataType?: string, getColumnDataType?: (col
 export interface VirtualizedEditableGridProps {
     items: any[];
     columns: IGridColumn[];
+    groups?: any[]; // FluentUI IGroup array for native hierarchy support
     height: number | string;
     width?: number | string;
     onCellEdit?: (itemId: string, columnKey: string, newValue: any) => void;
+    onToggleGroupCollapse?: (group: any) => void;
     onCommitChanges?: (changes: any[]) => Promise<void>;
     onCancelChanges?: () => void;
     enableInlineEditing?: boolean;
@@ -167,9 +169,11 @@ interface EditingState {
 export const VirtualizedEditableGrid = React.forwardRef<VirtualizedEditableGridRef, VirtualizedEditableGridProps>(({
     items = [],
     columns = [],
+    groups, // FluentUI IGroup array for hierarchy
     height,
     width = '100%',
     onCellEdit,
+    onToggleGroupCollapse,
     onCommitChanges,
     onCancelChanges,
     enableInlineEditing = true,
@@ -733,12 +737,43 @@ export const VirtualizedEditableGrid = React.forwardRef<VirtualizedEditableGridR
         };
     }, []);
 
+    // Expand items array to include group headers when groups are provided
+    // This allows us to virtualize both group headers and data rows
+    const virtualizedItems = React.useMemo(() => {
+        if (!groups || groups.length === 0) {
+            return filteredItems;
+        }
+
+        const expandedItems: any[] = [];
+        
+        groups.forEach(group => {
+            // Add group header as a special item
+            expandedItems.push({
+                __isGroupHeader: true,
+                __group: group,
+                key: `group-${group.key}`
+            });
+            
+            // Add group items (based on startIndex and count)
+            if (!group.isCollapsed) {
+                const groupItems = filteredItems.slice(group.startIndex, group.startIndex + group.count);
+                expandedItems.push(...groupItems);
+            }
+        });
+        
+        return expandedItems;
+    }, [filteredItems, groups]);
+
     // Virtual scrolling container ref
     // PURE VIRTUALIZATION - Always on, META/Google competitive performance
     const virtualizer = useVirtualizer({
-        count: filteredItems.length,
+        count: virtualizedItems.length,
         getScrollElement: () => parentRef.current,
-        estimateSize: () => rowHeight,
+        estimateSize: (index) => {
+            // Group headers are taller than regular rows
+            const item = virtualizedItems[index];
+            return item?.__isGroupHeader ? 48 : rowHeight;
+        },
         overscan: overscan,
         // Ultimate performance features for enterprise competition
         measureElement: enableMemoryPooling ? undefined : (element: any) => {
@@ -1325,12 +1360,64 @@ export const VirtualizedEditableGrid = React.forwardRef<VirtualizedEditableGridR
         }
     }), [commitAllChanges, cancelAllChanges, pendingChanges.size, virtualizer, filteredItems.length]);
 
-    // Render virtualized row
+    // Render virtualized row (supports both regular rows and group headers)
     const renderRowContent = React.useCallback((virtualRow: any) => {
         const { index } = virtualRow;
-        const item = filteredItems[index];
+        const item = virtualizedItems[index];
         if (!item) return null;
 
+        // Handle group header rendering
+        if (item.__isGroupHeader) {
+            const group = item.__group;
+            const { Icon: ChevronIcon } = require('@fluentui/react/lib/Icon');
+            
+            return (
+                <div
+                    key={`group-${group.key}`}
+                    className="virtualized-group-header"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        minWidth: `${totalGridWidth}px`,
+                        height: `${virtualRow.size}px`,
+                        transform: `translateY(${virtualRow.start}px)`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        backgroundColor: '#f3f2f1',
+                        borderBottom: '1px solid #c8c6c4',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        padding: '0 12px',
+                        fontSize: '14px',
+                        color: '#201f1e'
+                    }}
+                    onClick={() => {
+                        if (onToggleGroupCollapse) {
+                            onToggleGroupCollapse(group);
+                        }
+                    }}
+                >
+                    <ChevronIcon
+                        iconName={group.isCollapsed ? 'ChevronRight' : 'ChevronDown'}
+                        style={{
+                            marginRight: '8px',
+                            fontSize: '12px',
+                            transition: 'transform 0.2s'
+                        }}
+                    />
+                    <span>{group.name}</span>
+                    {group.data?.hasChildren && (
+                        <span style={{ marginLeft: '8px', color: '#605e5c', fontWeight: 400 }}>
+                            ({group.data.childCount})
+                        </span>
+                    )}
+                </div>
+            );
+        }
+
+        // Regular data row rendering
         const isEven = index % 2 === 0;
         const rowClassName = `virtualized-row ${isEven ? 'even' : 'odd'}`;
         
@@ -1745,7 +1832,7 @@ export const VirtualizedEditableGrid = React.forwardRef<VirtualizedEditableGridR
                 })}
             </div>
         );
-    }, [filteredItems, columns, memoizedColumnWidths, editingState, pendingChanges, readOnlyColumns, enableInlineEditing, enableDragFill, startEdit, commitEdit, cancelEdit, memoizedAvailableValues, onItemClick, onItemDoubleClick, refreshTrigger]);
+    }, [filteredItems, columns, memoizedColumnWidths, editingState, pendingChanges, readOnlyColumns, enableInlineEditing, enableDragFill, startEdit, commitEdit, cancelEdit, memoizedAvailableValues, onItemClick, onItemDoubleClick, refreshTrigger, groups, onToggleGroupCollapse]);
 
     // PERFORMANCE OPTIMIZATION: Create stable render function to prevent unnecessary re-renders
     const renderRow = React.useCallback((virtualRow: any) => {
@@ -2077,6 +2164,7 @@ export const VirtualizedEditableGrid = React.forwardRef<VirtualizedEditableGridR
         </div>
     );
 
+    // Integrated virtualized rendering with optional group support
     return (
         <div 
             className="virtualized-editable-grid-container"

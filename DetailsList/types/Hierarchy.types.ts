@@ -84,6 +84,9 @@ export interface HierarchyNode<T = any> {
     
     /** Whether this node is visible (based on parent expansion state) */
     isVisible: boolean;
+    
+    /** Source dataset type: 'parent' or 'child' */
+    datasetType?: 'parent' | 'child';
 }
 
 /**
