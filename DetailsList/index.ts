@@ -458,15 +458,28 @@ export class HierarchicalDetailsListV1 implements ComponentFramework.ReactContro
             console.log(`🔍 Parent dataset columns:`, parentDataset.columns?.map(c => c.name));
             console.log(`🔍 Child dataset columns:`, childDataset.columns?.map(c => c.name));
 
+            // WORKAROUND: Power Apps doesn't expose Fields config for childRecords dataset
+            // If childDataset has no columns but both datasets point to same table, 
+            // the child records still have the data - we just can't see the column metadata
+            // The getValue() method will still work with the correct column names
+            
             // Check for self-referencing hierarchy (same dataset split by modifier column)
             const modifierColumn = this.context?.parameters?.ParentReferenceColumn?.raw;
             if (modifierColumn) {
                 console.log(`🔄 Self-referencing hierarchy detected using modifier column: ${modifierColumn}`);
                 
                 // Filter parent records: only those where modifier column is NULL/empty
+                let sampleLog = 0;
                 const filteredParents = childRecords.filter(record => {
                     const modValue = record.getValue ? record.getValue(modifierColumn) : (record as any)[modifierColumn];
                     const isEmpty = modValue === null || modValue === undefined || modValue === '' || modValue === 'NULL';
+                    
+                    if (sampleLog < 3) {
+                        const tagIdValue = record.getValue ? record.getValue('TagID') : (record as any)['TagID'];
+                        console.log(`  Record ${sampleLog + 1}: TagID="${tagIdValue}", ${modifierColumn}="${modValue}", isEmpty=${isEmpty}`);
+                        sampleLog++;
+                    }
+                    
                     return isEmpty;
                 });
                 
